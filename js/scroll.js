@@ -1,58 +1,57 @@
 // js/scroll.js
 
-// Referencia al contenedor de scroll y a todas las secciones
+// Esperar a que la página cargue para refrescar AOS al inicio
+window.addEventListener('load', () => {
+  if (window.AOS) AOS.refresh();
+});
+
 const main = document.querySelector('#scroll-container');
 const sections = document.querySelectorAll('section');
 
 // Inicializar Lenis
 const lenis = new Lenis({
-  wrapper: main, // El contenedor que tiene overflow-y-scroll
-  content: main.firstElementChild, // El hijo directo que contiene las secciones
+  wrapper: main, // Contenedor de scroll
+  content: main.firstElementChild, // Contenido interno con las secciones
   duration: 1.2,
   easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeOutExpo
   smoothWheel: true,
-  smoothTouch: false,
+  smoothTouch: false
 });
 
-// Función recursiva para que Lenis se actualice en cada frame
+// Actualizar Lenis en cada frame
 function raf(time) {
   lenis.raf(time);
   requestAnimationFrame(raf);
 }
 requestAnimationFrame(raf);
 
-// Interceptar clics en enlaces del navbar que tengan href="#algo"
+// Interceptar clics en enlaces ancla para usar Lenis.scrollTo
 document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', e => {
-    e.preventDefault(); // Evitar el scroll nativo del navegador
-
-    const targetId = anchor.getAttribute('href').slice(1); // Quitar el "#"
+    e.preventDefault(); // Evitar el scroll nativo
+    const targetId = anchor.getAttribute('href').slice(1);
     const targetSection = document.getElementById(targetId);
-
     if (targetSection) {
-      // Desplázate hasta la posición inicial de la sección
       lenis.scrollTo(targetSection.offsetTop, {
         duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
       });
     }
   });
 });
 
-// Lógica para snap automático al dejar de hacer scroll
+// Lógica para "snap" automático a la sección más cercana
 let scrollTimeout = null;
 
 lenis.on('scroll', () => {
-  // Refrescar AOS en cada movimiento (si deseas un refresco continuo)
-  // Si prefieres refrescar tras cada "snap", hazlo al final del setTimeout
-  if (window.AOS) AOS.refreshHard?.();
+  // Refrescar AOS en cada scroll para detectar cambios
+  if (window.AOS) AOS.refresh();
 
-  // Limpiar un timeout previo, si lo hubiera
+  // Limpiar timeout previo
   if (scrollTimeout) clearTimeout(scrollTimeout);
 
   // Esperar 250ms tras el último evento de scroll
   scrollTimeout = setTimeout(() => {
-    // Hallar la sección más cercana al centro de la vista
     const scrollTop = main.scrollTop;
     const viewportHeight = main.clientHeight;
     const viewportCenterY = scrollTop + viewportHeight / 2;
@@ -65,14 +64,13 @@ lenis.on('scroll', () => {
       const sectionHeight = section.offsetHeight;
       const sectionCenterY = sectionTop + sectionHeight / 2;
       const distance = Math.abs(sectionCenterY - viewportCenterY);
-
       if (distance < minDistance) {
         minDistance = distance;
         closestSection = section;
       }
     });
 
-    // Hacer snap a la sección encontrada
+    // Realizar el "snap" a la sección encontrada
     if (closestSection) {
       const sectionOffset =
         closestSection.offsetTop +
@@ -81,10 +79,10 @@ lenis.on('scroll', () => {
 
       lenis.scrollTo(sectionOffset, {
         duration: 1.2,
-        easing: (t) => t * (2 - t), // easeOutQuad
+        easing: (t) => t * (2 - t) // easeOutQuad
       });
 
-      // Opcional: refrescar AOS tras el snap final
+      // Después del snap, refrescar AOS para activar animaciones
       setTimeout(() => {
         if (window.AOS) AOS.refresh();
       }, 1300);
