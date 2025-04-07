@@ -1,44 +1,29 @@
 // js/scroll.js
 
-const main = document.querySelector('#scroll-container'); // ahora tiene un ID
+const main = document.querySelector('#scroll-container');
 const sections = document.querySelectorAll('section');
+
 let scrollTimeout = null;
 
-// Curva de easing: aceleración suave y desaceleración (easeInOutQuad)
-function easeInOutQuad(t) {
-  return t < 0.5
-    ? 2 * t * t
-    : -1 + (4 - 2 * t) * t;
+// 1. Iniciar Lenis y decirle que el contenedor es el main
+const lenis = new Lenis({
+  wrapper: main, // el contenedor que hace scroll
+  content: main.firstElementChild, // el hijo directo que contiene el contenido (tus secciones)
+  duration: 1.2,
+  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeOutExpo
+  smoothWheel: true,
+  smoothTouch: false
+});
+
+// 2. Ejecutar Lenis en cada frame
+function raf(time) {
+  lenis.raf(time);
+  requestAnimationFrame(raf);
 }
+requestAnimationFrame(raf);
 
-/**
- * Scroll animado desde la posición actual hasta `targetY`
- * usando easing y requestAnimationFrame
- */
-function customSmoothScroll(targetY, durationMs = 800, callback) {
-  const startY = main.scrollTop;
-  const distance = targetY - startY;
-  const startTime = performance.now();
-
-  function animateScroll(currentTime) {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / durationMs, 1);
-    const easedProgress = easeInOutQuad(progress);
-
-    main.scrollTop = startY + distance * easedProgress;
-
-    if (progress < 1) {
-      requestAnimationFrame(animateScroll);
-    } else if (callback && typeof callback === 'function') {
-      callback(); // ejecuta AOS.refresh u otro código al final
-    }
-  }
-
-  requestAnimationFrame(animateScroll);
-}
-
-// Detectar fin de scroll manual
-main.addEventListener('scroll', () => {
+// 3. Detectar scroll manual (parada del usuario)
+lenis.on('scroll', () => {
   if (scrollTimeout) clearTimeout(scrollTimeout);
 
   scrollTimeout = setTimeout(() => {
@@ -62,17 +47,20 @@ main.addEventListener('scroll', () => {
     });
 
     if (closestSection) {
-      const targetY =
+      const sectionOffset =
         closestSection.offsetTop +
         closestSection.offsetHeight / 2 -
         viewportHeight / 2;
 
-      // Scroll animado + refresh de AOS al finalizar
-      customSmoothScroll(targetY, 1000, () => {
-        if (window.AOS && typeof AOS.refresh === 'function') {
-          AOS.refresh();
-        }
+      lenis.scrollTo(sectionOffset, {
+        duration: 1.2,
+        easing: (t) => t * (2 - t), // easeOutQuad
       });
+
+      // Refresh AOS tras scroll
+      setTimeout(() => {
+        if (window.AOS) AOS.refresh();
+      }, 1300);
     }
-  }, 300); // espera tras scroll (ajustable)
+  }, 250); // espera para detectar parada (ajustable)
 });
