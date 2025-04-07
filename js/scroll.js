@@ -1,32 +1,58 @@
 // js/scroll.js
 
+// Referencia al contenedor de scroll y a todas las secciones
 const main = document.querySelector('#scroll-container');
 const sections = document.querySelectorAll('section');
 
-let scrollTimeout = null;
-
-// 1. Iniciar Lenis y decirle que el contenedor es el main
+// Inicializar Lenis
 const lenis = new Lenis({
-  wrapper: main, // el contenedor que hace scroll
-  content: main.firstElementChild, // el hijo directo que contiene el contenido (tus secciones)
+  wrapper: main, // El contenedor que tiene overflow-y-scroll
+  content: main.firstElementChild, // El hijo directo que contiene las secciones
   duration: 1.2,
   easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeOutExpo
   smoothWheel: true,
-  smoothTouch: false
+  smoothTouch: false,
 });
 
-// 2. Ejecutar Lenis en cada frame
+// Función recursiva para que Lenis se actualice en cada frame
 function raf(time) {
   lenis.raf(time);
   requestAnimationFrame(raf);
 }
 requestAnimationFrame(raf);
 
-// 3. Detectar scroll manual (parada del usuario)
+// Interceptar clics en enlaces del navbar que tengan href="#algo"
+document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', e => {
+    e.preventDefault(); // Evitar el scroll nativo del navegador
+
+    const targetId = anchor.getAttribute('href').slice(1); // Quitar el "#"
+    const targetSection = document.getElementById(targetId);
+
+    if (targetSection) {
+      // Desplázate hasta la posición inicial de la sección
+      lenis.scrollTo(targetSection.offsetTop, {
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
+    }
+  });
+});
+
+// Lógica para snap automático al dejar de hacer scroll
+let scrollTimeout = null;
+
 lenis.on('scroll', () => {
+  // Refrescar AOS en cada movimiento (si deseas un refresco continuo)
+  // Si prefieres refrescar tras cada "snap", hazlo al final del setTimeout
+  if (window.AOS) AOS.refreshHard?.();
+
+  // Limpiar un timeout previo, si lo hubiera
   if (scrollTimeout) clearTimeout(scrollTimeout);
 
+  // Esperar 250ms tras el último evento de scroll
   scrollTimeout = setTimeout(() => {
+    // Hallar la sección más cercana al centro de la vista
     const scrollTop = main.scrollTop;
     const viewportHeight = main.clientHeight;
     const viewportCenterY = scrollTop + viewportHeight / 2;
@@ -46,6 +72,7 @@ lenis.on('scroll', () => {
       }
     });
 
+    // Hacer snap a la sección encontrada
     if (closestSection) {
       const sectionOffset =
         closestSection.offsetTop +
@@ -57,10 +84,10 @@ lenis.on('scroll', () => {
         easing: (t) => t * (2 - t), // easeOutQuad
       });
 
-      // Refresh AOS tras scroll
+      // Opcional: refrescar AOS tras el snap final
       setTimeout(() => {
         if (window.AOS) AOS.refresh();
       }, 1300);
     }
-  }, 250); // espera para detectar parada (ajustable)
+  }, 250);
 });
