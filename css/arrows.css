@@ -1,17 +1,33 @@
-/* From Uiverse.io by ArturCodeCraft */ 
-/* ESTRUCTURA BASE DE CUALQUIER FLECHA */
+/* BASE DE LAS FLECHAS */
 .arrow {
   width: 50px;
   height: 60px;
   position: absolute;
-  left: 50%;
-  top: 50%;
   cursor: pointer;
   transition: transform 0.1s;
-  transform: translate(-50%, -50%);
 }
 
-/* BARRAS DE FLECHA: IGUALES PARA AMBAS */
+/* Posicionamiento para la flecha hacia arriba (debajo de la navbar) */
+.arrow.arrow-up {
+  top: 20px;       /* Ajusta este valor para definir la distancia desde el top (debajo de la navbar) */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Posicionamiento para la flecha hacia abajo (encima del footer) */
+.arrow.arrow-down {
+  bottom: 20px;    /* Ajusta este valor para definir la distancia desde el bottom (por encima del footer) */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Efecto de clic para ambas flechas */
+.arrow.arrow-up:active,
+.arrow.arrow-down:active {
+  transform: translateX(-50%) scale(0.9);
+}
+
+/* BARRAS DE LAS FLECHAS (comunes para flecha hacia arriba y hacia abajo) */
 .arrow-bar-left,
 .arrow-bar-right {
   background-color: #666;
@@ -35,7 +51,7 @@
 }
 
 /* ESTILOS DE LA FLECHA HACIA ABAJO */
-/* ÁREA AMPLIADA DE CLIC */
+/* Área ampliada de clic */
 .arrow-down::before {
   content: "";
   position: absolute;
@@ -81,7 +97,7 @@
 }
 
 /* ESTILOS DE LA FLECHA HACIA ARRIBA */
-/* ÁREA AMPLIADA DE CLIC */
+/* Área ampliada de clic */
 .arrow-up::before {
   content: "";
   position: absolute;
@@ -124,9 +140,4 @@
 .arrow-up:hover .arrow-bar-right::after {
   height: 100%;
   transition-delay: 0s;
-}
-
-/* CLIC: EFECTO DE PRESIÓN */
-.arrow:active {
-  transform: translate(-50%, -50%) scale(0.9);
 }
