@@ -1,100 +1,132 @@
-/* Botón genérico */
+/* From Uiverse.io by ArturCodeCraft */ 
+/* ESTRUCTURA BASE DE CUALQUIER FLECHA */
 .arrow {
-    cursor: pointer;
-    height: 60px;
-    width: 50px;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    transition: transform 0.1s;
-  }
-  
-  .arrow:active {
-    transform: translateX(-50%) translateY(-50%) scale(0.9);
-  }
-  
-  .arrow-top, .arrow-bottom {
-    background-color: #666;
-    height: 4px;
-    position: absolute;
-    left: -5px;
-    top: 50%;
-    width: 100%;
-  }
-  
-  .arrow-top:after, .arrow-bottom:after {
-    background-color: #111111;
-    content: "";
-    height: 100%;
-    position: absolute;
-    top: 0;
-    transition: all 0.15s;
-  }
-  
-  /* Flecha hacia abajo */
-  .arrow.down .arrow-top {
-    transform: rotate(45deg);
-    transform-origin: bottom right;
-  }
-  
-  .arrow.down .arrow-top:after {
-    left: 100%;
-    right: 0;
-    transition-delay: 0s;
-  }
-  
-  .arrow.down .arrow-bottom {
-    transform: rotate(-45deg);
-    transform-origin: top right;
-  }
-  
-  .arrow.down .arrow-bottom:after {
-    left: 0;
-    right: 100%;
-    transition-delay: 0.15s;
-  }
-  
-  .arrow.down:hover .arrow-top:after {
-    left: 0;
-    transition-delay: 0.15s;
-  }
-  
-  .arrow.down:hover .arrow-bottom:after {
-    right: 0;
-    transition-delay: 0s;
-  }
-  
-  /* Flecha hacia arriba */
-  .arrow.up .arrow-top {
-    transform: rotate(-45deg);
-    transform-origin: top right;
-  }
-  
-  .arrow.up .arrow-top:after {
-    left: 0;
-    right: 100%;
-    transition-delay: 0.15s;
-  }
-  
-  .arrow.up .arrow-bottom {
-    transform: rotate(45deg);
-    transform-origin: bottom right;
-  }
-  
-  .arrow.up .arrow-bottom:after {
-    left: 100%;
-    right: 0;
-    transition-delay: 0s;
-  }
-  
-  .arrow.up:hover .arrow-top:after {
-    right: 0;
-    transition-delay: 0s;
-  }
-  
-  .arrow.up:hover .arrow-bottom:after {
-    left: 0;
-    transition-delay: 0.15s;
-  }
-      
+  width: 50px;
+  height: 60px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  cursor: pointer;
+  transition: transform 0.1s;
+  transform: translate(-50%, -50%);
+}
+
+/* BARRAS DE FLECHA: IGUALES PARA AMBAS */
+.arrow-bar-left,
+.arrow-bar-right {
+  background-color: #666;
+  height: 100%;
+  left: 50%;
+  position: absolute;
+  width: 4px;
+  top: 50%;
+}
+
+/* RELLENO INTERNO BASE */
+.arrow-bar-left::after,
+.arrow-bar-right::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 0%;
+  background-color: #1f1f1f;
+  left: 0;
+  transition: height 0.15s;
+}
+
+/* ESTILOS DE LA FLECHA HACIA ABAJO */
+/* ÁREA AMPLIADA DE CLIC */
+.arrow-down::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -15%);
+  width: 200px;
+  height: 120px;
+  background: transparent;
+  z-index: 1;
+}
+
+.arrow-down .arrow-bar-left {
+  transform: rotate(65deg);
+  transform-origin: bottom left;
+}
+
+.arrow-down .arrow-bar-right {
+  transform: rotate(-65deg);
+  transform-origin: bottom right;
+}
+
+.arrow-down .arrow-bar-left::after {
+  bottom: 0;
+  top: auto;
+  transition-delay: 0s;
+}
+
+.arrow-down .arrow-bar-right::after {
+  top: 0;
+  bottom: auto;
+  transition-delay: 0.15s;
+}
+
+.arrow-down:hover .arrow-bar-left::after {
+  height: 100%;
+  transition-delay: 0.15s;
+}
+
+.arrow-down:hover .arrow-bar-right::after {
+  height: 100%;
+  transition-delay: 0s;
+}
+
+/* ESTILOS DE LA FLECHA HACIA ARRIBA */
+/* ÁREA AMPLIADA DE CLIC */
+.arrow-up::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -35%);
+  width: 200px;
+  height: 120px;
+  background: transparent;
+  z-index: 1;
+}
+
+.arrow-up .arrow-bar-left {
+  transform: rotate(-65deg);
+  transform-origin: top left;
+}
+
+.arrow-up .arrow-bar-right {
+  transform: rotate(65deg);
+  transform-origin: top right;
+}
+
+.arrow-up .arrow-bar-left::after {
+  top: 0;
+  bottom: auto;
+  transition-delay: 0s;
+}
+
+.arrow-up .arrow-bar-right::after {
+  bottom: 0;
+  top: auto;
+  transition-delay: 0.15s;
+}
+
+.arrow-up:hover .arrow-bar-left::after {
+  height: 100%;
+  transition-delay: 0.15s;
+}
+
+.arrow-up:hover .arrow-bar-right::after {
+  height: 100%;
+  transition-delay: 0s;
+}
+
+/* CLIC: EFECTO DE PRESIÓN */
+.arrow:active {
+  transform: translate(-50%, -50%) scale(0.9);
+}
