@@ -3,31 +3,29 @@
   width: 50px;
   height: 60px;
   position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   cursor: pointer;
   transition: transform 0.1s;
+  z-index: 60; /* Se asegura de que las flechas estén por encima del contenido */
 }
 
-/* Posicionamiento para la flecha hacia arriba (debajo de la navbar) */
+/* Flecha hacia arriba: Se posiciona a 20px desde el borde superior de la sección */
 .arrow.arrow-up {
-  top: 20px;       /* Ajusta este valor para definir la distancia desde el top (debajo de la navbar) */
-  left: 50%;
-  transform: translateX(-50%);
+  top: 20px; /* Ajusta este valor para modificar el espacio desde la parte superior */
 }
 
-/* Posicionamiento para la flecha hacia abajo (encima del footer) */
+/* Flecha hacia abajo: Se posiciona a 20px desde el borde inferior de la sección */
 .arrow.arrow-down {
-  bottom: 20px;    /* Ajusta este valor para definir la distancia desde el bottom (por encima del footer) */
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 20px; /* Ajusta este valor para modificar el espacio desde la parte inferior */
 }
 
 /* Efecto de clic para ambas flechas */
-.arrow.arrow-up:active,
-.arrow.arrow-down:active {
+.arrow:active {
   transform: translateX(-50%) scale(0.9);
 }
 
-/* BARRAS DE LAS FLECHAS (comunes para flecha hacia arriba y hacia abajo) */
+/* BARRAS DE LAS FLECHAS: Comunes para ambas direcciones */
 .arrow-bar-left,
 .arrow-bar-right {
   background-color: #666;
