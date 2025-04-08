@@ -22,7 +22,7 @@ section {
 
 /* Posiciona la flecha hacia abajo a 4rem (altura de footer) + 20px de margen desde el bottom del contenedor de la sección */
 .arrow.arrow-down {
-  bottom: calc(8rem + 100px);
+  bottom: calc(8rem + 20px);
 }
 
 /* Efecto de clic para ambas flechas */
