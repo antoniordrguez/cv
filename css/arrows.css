@@ -1,3 +1,8 @@
+/* Hacemos que cada sección sea contenedor relativo */
+section {
+  position: relative;
+}
+
 /* BASE DE LAS FLECHAS */
 .arrow {
   width: 50px;
@@ -7,17 +12,17 @@
   transform: translateX(-50%);
   cursor: pointer;
   transition: transform 0.1s;
-  z-index: 60; /* Se asegura de que las flechas estén por encima del contenido */
+  z-index: 60;
 }
 
-/* Flecha hacia arriba: Se posiciona a 20px desde el borde superior de la sección */
+/* Posiciona la flecha hacia arriba a 4rem (altura de navbar) + 20px de margen desde el top del contenedor de la sección */
 .arrow.arrow-up {
-  top: 20px; /* Ajusta este valor para modificar el espacio desde la parte superior */
+  top: calc(4rem + 20px);
 }
 
-/* Flecha hacia abajo: Se posiciona a 20px desde el borde inferior de la sección */
+/* Posiciona la flecha hacia abajo a 4rem (altura de footer) + 20px de margen desde el bottom del contenedor de la sección */
 .arrow.arrow-down {
-  bottom: 20px; /* Ajusta este valor para modificar el espacio desde la parte inferior */
+  bottom: calc(4rem + 20px);
 }
 
 /* Efecto de clic para ambas flechas */
@@ -25,7 +30,7 @@
   transform: translateX(-50%) scale(0.9);
 }
 
-/* BARRAS DE LAS FLECHAS: Comunes para ambas direcciones */
+/* BARRAS DE LAS FLECHAS: reglas comunes para ambas direcciones */
 .arrow-bar-left,
 .arrow-bar-right {
   background-color: #666;
@@ -49,7 +54,7 @@
 }
 
 /* ESTILOS DE LA FLECHA HACIA ABAJO */
-/* Área ampliada de clic */
+/* Área ampliada de clic para facilitar la interacción */
 .arrow-down::before {
   content: "";
   position: absolute;
@@ -95,7 +100,7 @@
 }
 
 /* ESTILOS DE LA FLECHA HACIA ARRIBA */
-/* Área ampliada de clic */
+/* Área ampliada de clic para facilitar la interacción */
 .arrow-up::before {
   content: "";
   position: absolute;
