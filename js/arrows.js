@@ -30,9 +30,13 @@ document.querySelectorAll('.arrow').forEach(arrow => {
 const arrows = document.querySelectorAll('.arrow');
 let inactivityTimer;
 
-// Función para ocultar las flechas (quita la clase 'visible')
+// Ocultar todas las flechas excepto la que esté en hover
 function hideArrows() {
-  arrows.forEach(arrow => arrow.classList.remove('visible'));
+  arrows.forEach(arrow => {
+    if (!arrow.matches(':hover')) {
+      arrow.classList.remove('visible');
+    }
+  });
 }
 
 // Función para mostrar las flechas (añade la clase 'visible')
@@ -40,14 +44,14 @@ function showArrows() {
   arrows.forEach(arrow => arrow.classList.add('visible'));
 }
 
-// Función que reinicia el temporizador de inactividad y, tras 500 ms sin actividad, muestra las flechas.
+// Función que reinicia el temporizador de inactividad y esconde las flechas.
 function resetInactivityTimer() {
   showArrows();
   clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(hideArrows, 500); // 500 ms de inactividad para mostrar las flechas
+  inactivityTimer = setTimeout(hideArrows, 650); // 650 ms de inactividad para mostrar las flechas
 }
 
-//— Eventos en el contenedor de scroll (donde ocurre el scroll) —//
+//— Eventos en el contenedor de scroll —//
 const scrollContainer = document.getElementById('scroll-container');
 if (scrollContainer) {
   scrollContainer.addEventListener('mousemove', resetInactivityTimer);
@@ -55,6 +59,16 @@ if (scrollContainer) {
   scrollContainer.addEventListener('scroll', hideArrows);
 }
 
+// Mostrar siempre la flecha en la que hago hover (solo esa)
+arrows.forEach(arrow => {
+  arrow.addEventListener('mouseenter', () => {
+    arrow.classList.add('visible');
+    clearTimeout(inactivityTimer);
+  });
+  arrow.addEventListener('mouseleave', () => {
+    resetInactivityTimer(); // podría ocultarla si no hay más actividad
+  });
+});
 
 window.addEventListener('load', hideArrows);
   
