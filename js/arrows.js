@@ -26,37 +26,47 @@ document.querySelectorAll('.arrow').forEach(arrow => {
   });
 });
 
-
-// 2. Código para mostrar/ocultar las flechas en función de la inactividad del usuario
+// 2. Código para mostrar/ocultar las flechas según inactividad
 const arrows = document.querySelectorAll('.arrow');
 let inactivityTimer;
 
-// Función para ocultar las flechas (quitar la clase 'visible')
+// Función para ocultar las flechas (quita la clase 'visible')
 function hideArrows() {
   arrows.forEach(arrow => arrow.classList.remove('visible'));
 }
 
-// Función para mostrar las flechas (añadir la clase 'visible')
+// Función para mostrar las flechas (añade la clase 'visible')
 function showArrows() {
   arrows.forEach(arrow => arrow.classList.add('visible'));
 }
 
-// Función para reiniciar el temporizador de inactividad.
-// Al detectar actividad se ocultan inmediatamente las flechas y se reinicia el contador.
+// Función para reiniciar el temporizador de inactividad.  
+// Al detectar actividad se ocultan las flechas y se reinicia el contador.
 function resetInactivityTimer() {
   hideArrows();
   clearTimeout(inactivityTimer);
   inactivityTimer = setTimeout(() => {
     showArrows();
-  }, 150); // 0.15 segundos de inactividad para mostrar las flechas
+  }, 300); // 300 ms de inactividad para mostrar las flechas
 }
 
-// Escucha eventos de actividad
+// Para detectar la actividad dentro del contenedor de scroll:
+const scrollContainer = document.getElementById('scroll-container');
+if (scrollContainer) {
+  scrollContainer.addEventListener('mousemove', resetInactivityTimer);
+  scrollContainer.addEventListener('scroll', resetInactivityTimer);
+  scrollContainer.addEventListener('touchmove', resetInactivityTimer);
+} else {
+  document.addEventListener('mousemove', resetInactivityTimer);
+  document.addEventListener('scroll', resetInactivityTimer);
+  document.addEventListener('touchmove', resetInactivityTimer);
+}
+
+// También, por si el usuario interactúa fuera del contenedor:
 document.addEventListener('mousemove', resetInactivityTimer);
-document.addEventListener('scroll', resetInactivityTimer);
 document.addEventListener('touchmove', resetInactivityTimer);
 
-// Opcional: iniciar el temporizador al cargar la página para mostrar las flechas después de 0.3 segundos
+// Al cargar la página, iniciamos el timer para mostrar las flechas después de 300 ms
 window.addEventListener('load', () => {
   inactivityTimer = setTimeout(() => {
     showArrows();
