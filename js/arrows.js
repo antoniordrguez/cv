@@ -27,7 +27,6 @@ document.querySelectorAll('.arrow').forEach(arrow => {
 });
 
 // 2. Código para mostrar/ocultar las flechas según inactividad y hover sobre ellas
-
 const arrows = document.querySelectorAll('.arrow');
 let inactivityTimer;
 
@@ -41,11 +40,11 @@ function showArrows() {
   arrows.forEach(arrow => arrow.classList.add('visible'));
 }
 
-// Función que reinicia el temporizador de inactividad y, tras 150 ms sin actividad, muestra las flechas.
+// Función que reinicia el temporizador de inactividad y, tras 500 ms sin actividad, muestra las flechas.
 function resetInactivityTimer() {
   showArrows();
   clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(hideArrows(), 500); // 500 ms de inactividad para mostrar las flechas
+  inactivityTimer = setTimeout(hideArrows, 500); // 500 ms de inactividad para mostrar las flechas
 }
 
 //— Eventos en el contenedor de scroll (donde ocurre el scroll) —//
@@ -56,8 +55,6 @@ if (scrollContainer) {
   scrollContainer.addEventListener('scroll', hideArrows);
 }
 
-//— Mostrar las flechas al cargar la página tras 500 ms —//
-window.addEventListener('load', () => {
-  hideArrows();
-});
+
+window.addEventListener('load', hideArrows);
   
