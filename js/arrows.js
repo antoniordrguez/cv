@@ -53,14 +53,11 @@ const scrollContainer = document.getElementById('scroll-container');
 if (scrollContainer) {
   scrollContainer.addEventListener('mousemove', resetInactivityTimer);
   scrollContainer.addEventListener('touchmove', resetInactivityTimer);
-  scrollContainer.addEventListener('scroll', () => {
-    hideArrows();
-    clearTimeout(inactivityTimer); // Cancelamos cualquier espera activa
-  });
+  scrollContainer.addEventListener('scroll', hideArrows);
 }
 
 //— Mostrar las flechas al cargar la página tras 500 ms —//
 window.addEventListener('load', () => {
-  inactivityTimer = setTimeout(showArrows, 500);
+  hideArrows();
 });
   
