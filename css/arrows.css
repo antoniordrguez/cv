@@ -1,42 +1,48 @@
-/* Hacemos que cada sección sea contenedor relativo */
+/* ===================== */
+/* CONTENEDORES SECCIÓN */
+/* ===================== */
 section {
   position: relative;
 }
 
+/* ================== */
 /* BASE DE LAS FLECHAS */
+/* ================== */
 .arrow {
   width: 50px;
   height: 60px;
   position: absolute;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%); /* Centramos horizontalmente */
   cursor: pointer;
   transition: transform 0.1s, opacity 0.5s ease;
   z-index: 60;
   opacity: 0;
 }
 
-/* Clase para mostrar la flecha */
+/* Mostrar flecha */
 .arrow.visible {
   opacity: 1;
 }
 
-/* Posiciona la flecha hacia arriba a 4rem (altura de navbar) + 20px de margen desde el top del contenedor de la sección */
+/* Posición de la flecha hacia arriba */
 .arrow.arrow-up {
   top: calc(4rem + 20px);
 }
 
-/* Posiciona la flecha hacia abajo a 4rem (altura de footer) + 20px de margen desde el bottom del contenedor de la sección */
+/* Posición de la flecha hacia abajo */
 .arrow.arrow-down {
   bottom: calc(4rem + 20px);
 }
 
-/* Efecto de clic para ambas flechas */
+/* Efecto al hacer clic */
 .arrow:active {
   transform: translateX(-50%) scale(0.9);
 }
 
-/* BARRAS DE LAS FLECHAS: reglas comunes para ambas direcciones */
+/* =========================== */
+/* BARRAS DE LAS FLECHAS */
+/* =========================== */
 .arrow-bar-left,
 .arrow-bar-right {
   background-color: #666;
@@ -47,7 +53,7 @@ section {
   top: 50%;
 }
 
-/* RELLENO INTERNO BASE */
+/* Relleno interno base */
 .arrow-bar-left::after,
 .arrow-bar-right::after {
   content: "";
@@ -59,66 +65,32 @@ section {
   transition: height 0.15s;
 }
 
-/* ESTILOS DE LA FLECHA HACIA ABAJO */
-/* Área ampliada de clic para facilitar la interacción */
-.arrow-down::before {
+/* =========================== */
+/* ÁREA AMPLIADA DE CLIC */
+/* =========================== */
+.arrow::before {
   content: "";
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -35%) scaleY(-1);
   width: 200px;
   height: 120px;
   background: transparent;
   z-index: 1;
 }
 
-.arrow-down .arrow-bar-left {
-  transform: rotate(65deg);
-  transform-origin: bottom left;
-}
-
-.arrow-down .arrow-bar-right {
-  transform: rotate(-65deg);
-  transform-origin: bottom right;
-}
-
-.arrow-down .arrow-bar-left::after {
-  bottom: 0;
-  top: auto;
-  transition-delay: 0s;
-}
-
-.arrow-down .arrow-bar-right::after {
-  top: 0;
-  bottom: auto;
-  transition-delay: 0.15s;
-}
-
-.arrow-down:hover .arrow-bar-left::after {
-  height: 100%;
-  transition-delay: 0.15s;
-}
-
-.arrow-down:hover .arrow-bar-right::after {
-  height: 100%;
-  transition-delay: 0s;
-}
-
-/* ESTILOS DE LA FLECHA HACIA ARRIBA */
-/* Área ampliada de clic para facilitar la interacción */
+/* Centrado vertical de la zona de interacción */
 .arrow-up::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
   transform: translate(-50%, -35%);
-  width: 200px;
-  height: 120px;
-  background: transparent;
-  z-index: 1;
 }
 
+.arrow-down::before {
+  transform: translate(-50%, 35%);
+}
+
+/* ================================ */
+/* FLECHA HACIA ARRIBA (ANIMACIÓN) */
+/* ================================ */
 .arrow-up .arrow-bar-left {
   transform: rotate(-65deg);
   transform-origin: top left;
@@ -147,6 +119,41 @@ section {
 }
 
 .arrow-up:hover .arrow-bar-right::after {
+  height: 100%;
+  transition-delay: 0s;
+}
+
+/* ================================== */
+/* FLECHA HACIA ABAJO (ANIMACIÓN) */
+/* ================================== */
+.arrow-down .arrow-bar-left {
+  transform: rotate(65deg);
+  transform-origin: bottom left;
+}
+
+.arrow-down .arrow-bar-right {
+  transform: rotate(-65deg);
+  transform-origin: bottom right;
+}
+
+.arrow-down .arrow-bar-left::after {
+  bottom: 0;
+  top: auto;
+  transition-delay: 0s;
+}
+
+.arrow-down .arrow-bar-right::after {
+  top: 0;
+  bottom: auto;
+  transition-delay: 0.15s;
+}
+
+.arrow-down:hover .arrow-bar-left::after {
+  height: 100%;
+  transition-delay: 0.15s;
+}
+
+.arrow-down:hover .arrow-bar-right::after {
   height: 100%;
   transition-delay: 0s;
 }
