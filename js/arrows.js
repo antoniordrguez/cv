@@ -47,7 +47,7 @@ function resetInactivityTimer() {
   clearTimeout(inactivityTimer);
   inactivityTimer = setTimeout(() => {
     showArrows();
-  }, 500); // 300 ms de inactividad para mostrar las flechas
+  }, 650); // 650 ms de inactividad para mostrar las flechas
 }
 
 // Para detectar la actividad dentro del contenedor de scroll:
@@ -58,15 +58,24 @@ if (scrollContainer) {
   scrollContainer.addEventListener('touchmove', resetInactivityTimer);
 }
 
+// Asignar eventos de hover directamente a las flechas
+arrows.forEach(arrow => {
+  arrow.addEventListener('mouseenter', () => {
+    clearTimeout(inactivityTimer);
+    showArrows();
+  });
+  arrow.addEventListener('mouseleave', resetInactivityTimer);
+});
+
 // También, por si el usuario interactúa fuera del contenedor:
 document.addEventListener('mousemove', resetInactivityTimer);
 document.addEventListener('scroll', resetInactivityTimer);
 document.addEventListener('touchmove', resetInactivityTimer);
 
-// Al cargar la página, iniciamos el timer para mostrar las flechas después de 300 ms
+// Al cargar la página, iniciamos el timer para mostrar las flechas después de 650 ms
 window.addEventListener('load', () => {
   inactivityTimer = setTimeout(() => {
     showArrows();
-  }, 500);
+  }, 650);
 });
   
