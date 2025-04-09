@@ -65,7 +65,7 @@ section {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: 50%;
+  top: 50%;
   transform: translate(-50%, 35%);
   width: 200px;
   height: 120px;
