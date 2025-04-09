@@ -43,40 +43,21 @@ function showArrows() {
 
 // Función que reinicia el temporizador de inactividad y, tras 150 ms sin actividad, muestra las flechas.
 function resetInactivityTimer() {
-  hideArrows();
+  showArrows();
   clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(showArrows, 500); // 500 ms de inactividad para mostrar las flechas
+  inactivityTimer = setTimeout(hideArrows(), 500); // 500 ms de inactividad para mostrar las flechas
 }
 
 //— Eventos en el contenedor de scroll (donde ocurre el scroll) —//
 const scrollContainer = document.getElementById('scroll-container');
 if (scrollContainer) {
   scrollContainer.addEventListener('mousemove', resetInactivityTimer);
-  scrollContainer.addEventListener('scroll', resetInactivityTimer);
   scrollContainer.addEventListener('touchmove', resetInactivityTimer);
-}
-
-//— Eventos globales para el movimiento del mouse —//
-// Aquí, antes de llamar a resetInactivityTimer, se verifica si el evento se dispara sobre una flecha.
-document.addEventListener('mousemove', (e) => {
-  if (e.target.closest('.arrow')) {
-    // Si el mouse está sobre una flecha, mostramos las flechas y cancelamos el timer
-    clearTimeout(inactivityTimer);
-    showArrows();
-  } else {
-    resetInactivityTimer();
-  }
-});
-document.addEventListener('touchmove', resetInactivityTimer);
-
-//— Eventos específicos sobre cada flecha —//
-arrows.forEach(arrow => {
-  arrow.addEventListener('mouseenter', () => {
-    clearTimeout(inactivityTimer);
-    showArrows();
+  scrollContainer.addEventListener('scroll', () => {
+    hideArrows();
+    clearTimeout(inactivityTimer); // Cancelamos cualquier espera activa
   });
-  arrow.addEventListener('mouseleave', resetInactivityTimer);
-});
+}
 
 //— Mostrar las flechas al cargar la página tras 500 ms —//
 window.addEventListener('load', () => {
