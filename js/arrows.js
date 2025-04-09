@@ -48,7 +48,7 @@ function resetInactivityTimer() {
   clearTimeout(inactivityTimer);
   inactivityTimer = setTimeout(() => {
     showArrows();
-  }, 2000); // 2 segundos de inactividad para mostrar las flechas
+  }, 500); // 0.5 segundos de inactividad para mostrar las flechas
 }
 
 // Escucha eventos de actividad
@@ -60,6 +60,6 @@ document.addEventListener('touchmove', resetInactivityTimer);
 window.addEventListener('load', () => {
   inactivityTimer = setTimeout(() => {
     showArrows();
-  }, 2000);
+  }, 1000);
 });
   
