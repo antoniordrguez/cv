@@ -48,7 +48,7 @@ function resetInactivityTimer() {
   clearTimeout(inactivityTimer);
   inactivityTimer = setTimeout(() => {
     showArrows();
-  }, 500); // 0.5 segundos de inactividad para mostrar las flechas
+  }, 150); // 0.15 segundos de inactividad para mostrar las flechas
 }
 
 // Escucha eventos de actividad
@@ -56,10 +56,10 @@ document.addEventListener('mousemove', resetInactivityTimer);
 document.addEventListener('scroll', resetInactivityTimer);
 document.addEventListener('touchmove', resetInactivityTimer);
 
-// Opcional: iniciar el temporizador al cargar la página para mostrar las flechas después de 2 segundos
+// Opcional: iniciar el temporizador al cargar la página para mostrar las flechas después de 0.3 segundos
 window.addEventListener('load', () => {
   inactivityTimer = setTimeout(() => {
     showArrows();
-  }, 1000);
+  }, 300);
 });
   
