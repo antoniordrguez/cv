@@ -239,26 +239,9 @@
         scrollContainer: '#scroll-container'
       });
     </script>
+    <!-- Script para el funcionamiento del nav bar -->
+    <script src="js/nav_click.js"></script>
     <!-- Script para el funcionamiento de las flechas -->
-    <script>
-      document.querySelectorAll('.arrow').forEach(arrow => {
-        arrow.addEventListener('click', function() {
-          const direction = arrow.getAttribute('data-direction'); // "up" o "down"
-          const currentSection = arrow.closest('section');
-          let targetSection = null;
-          if (direction === 'down') {
-            targetSection = currentSection.nextElementSibling;
-          } else if (direction === 'up') {
-            targetSection = currentSection.previousElementSibling;
-          }
-          if (targetSection) {
-            lenis.scrollTo(targetSection.offsetTop, {
-              duration: 1.2,
-              easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
-            });
-          }
-        });
-      });
-    </script>
+    <script src="js/arrows_click.js"></script>
   </body>
 </html>
