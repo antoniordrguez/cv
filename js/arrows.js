@@ -14,7 +14,7 @@ document.querySelectorAll('.arrow').forEach(arrow => {
       const scrollContainer = document.getElementById('scroll-container');
       const containerHeight = scrollContainer.clientHeight;
       // Calculamos la posición para centrar la sección de destino:
-      // Posición actual del targetSection más la mitad de su altura menos la mitad de la altura del contenedor.
+      // Posición del targetSection + mitad de su altura menos la mitad del contenedor.
       const targetScroll = targetSection.offsetTop + (targetSection.clientHeight / 2) - (containerHeight / 2);
       
       // Realizamos el scroll usando Lenis
@@ -26,7 +26,8 @@ document.querySelectorAll('.arrow').forEach(arrow => {
   });
 });
 
-// 2. Código para mostrar/ocultar las flechas según inactividad
+// 2. Código para mostrar/ocultar las flechas según inactividad y hover sobre ellas
+
 const arrows = document.querySelectorAll('.arrow');
 let inactivityTimer;
 
@@ -40,17 +41,14 @@ function showArrows() {
   arrows.forEach(arrow => arrow.classList.add('visible'));
 }
 
-// Función para reiniciar el temporizador de inactividad.  
-// Al detectar actividad se ocultan las flechas y se reinicia el contador.
+// Función que reinicia el temporizador de inactividad y, tras 150 ms sin actividad, muestra las flechas.
 function resetInactivityTimer() {
   hideArrows();
   clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(() => {
-    showArrows();
-  }, 650); // 650 ms de inactividad para mostrar las flechas
+  inactivityTimer = setTimeout(showArrows, 500); // 500 ms de inactividad para mostrar las flechas
 }
 
-// Para detectar la actividad dentro del contenedor de scroll:
+//— Eventos en el contenedor de scroll (donde ocurre el scroll) —//
 const scrollContainer = document.getElementById('scroll-container');
 if (scrollContainer) {
   scrollContainer.addEventListener('mousemove', resetInactivityTimer);
@@ -58,7 +56,20 @@ if (scrollContainer) {
   scrollContainer.addEventListener('touchmove', resetInactivityTimer);
 }
 
-// Asignar eventos de hover directamente a las flechas
+//— Eventos globales para el movimiento del mouse —//
+// Aquí, antes de llamar a resetInactivityTimer, se verifica si el evento se dispara sobre una flecha.
+document.addEventListener('mousemove', (e) => {
+  if (e.target.closest('.arrow')) {
+    // Si el mouse está sobre una flecha, mostramos las flechas y cancelamos el timer
+    clearTimeout(inactivityTimer);
+    showArrows();
+  } else {
+    resetInactivityTimer();
+  }
+});
+document.addEventListener('touchmove', resetInactivityTimer);
+
+//— Eventos específicos sobre cada flecha —//
 arrows.forEach(arrow => {
   arrow.addEventListener('mouseenter', () => {
     clearTimeout(inactivityTimer);
@@ -67,15 +78,8 @@ arrows.forEach(arrow => {
   arrow.addEventListener('mouseleave', resetInactivityTimer);
 });
 
-// También, por si el usuario interactúa fuera del contenedor:
-document.addEventListener('mousemove', resetInactivityTimer);
-document.addEventListener('scroll', resetInactivityTimer);
-document.addEventListener('touchmove', resetInactivityTimer);
-
-// Al cargar la página, iniciamos el timer para mostrar las flechas después de 650 ms
+//— Mostrar las flechas al cargar la página tras 500 ms —//
 window.addEventListener('load', () => {
-  inactivityTimer = setTimeout(() => {
-    showArrows();
-  }, 650);
+  inactivityTimer = setTimeout(showArrows, 500);
 });
   
