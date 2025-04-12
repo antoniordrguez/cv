@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Efecto Scroll Horizontal Fijo</title>
+  <title>Efecto Scroll Horizontal Fijo (Ajustado)</title>
   <style>
     /* Reset básico */
     body {
@@ -21,19 +21,18 @@
     /* Sección con altura extendida para permitir el scroll vertical */
     .scroll-section {
       position: relative;
-      /* La altura debe cubrir el ancho total del contenido horizontal.
-           En este ejemplo, 4 párrafos ocupando 100vw cada uno = 400vw, 
-           así que usamos 400vh, pero lo puedes ajustar según lo necesites. */
+      /* La altura debe ser proporcional al ancho total del contenido horizontal.
+           En este ejemplo, con 4 párrafos de 100vw, usamos 400vh. */
       height: 400vh;
     }
-    /* Contenedor fijo dentro de la sección para contener el contenido horizontal */
+    /* Contenedor sticky que se queda fijo durante el scroll dentro de la sección */
     .sticky-container {
       position: sticky;
       top: 0;
       height: 100vh;
       overflow: hidden;
     }
-    /* Contenedor horizontal que se desplazará con transform */
+    /* Contenedor horizontal que se desplaza internamente */
     .horizontal-container {
       display: flex;
       height: 100%;
@@ -77,20 +76,19 @@
     const horizontalContainer = document.getElementById('horizontal-container');
     const scrollSection = document.querySelector('.scroll-section');
 
-    window.addEventListener('scroll', () => {
-      // Obtenemos la distancia desde el top de la ventana hasta la sección
-      const sectionRect = scrollSection.getBoundingClientRect();
-      // Para calcular el progreso, usamos la altura de la ventana.
-      // Cuando la parte superior de la sección toca la parte superior de la ventana,
-      // sectionRect.top es 0; al final, será - (sección alta - window.innerHeight).
-      const progress = Math.min(Math.max((window.innerHeight - sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 0), 1);
-      
-      // Calculamos el máximo desplazamiento horizontal:
-      // totalWidth es el ancho total del contenido horizontal.
-      const totalWidth = horizontalContainer.scrollWidth;
-      const maxTranslate = totalWidth - window.innerWidth;
+    // Calculamos el máximo desplazamiento horizontal (la diferencia entre el ancho total del contenido y el viewport)
+    const totalWidth = horizontalContainer.scrollWidth;
+    const maxTranslate = totalWidth - window.innerWidth;
 
-      // Aplicamos la transformación horizontal basada en el progreso.
+    window.addEventListener('scroll', () => {
+      const sectionRect = scrollSection.getBoundingClientRect();
+      let progress = 0;
+      
+      // Solo iniciamos el desplazamiento cuando la parte superior de la sección ya ha llegado a (o sobre) la parte superior del viewport.
+      if (sectionRect.top <= 0) {
+        progress = Math.min((Math.abs(sectionRect.top)) / (scrollSection.offsetHeight - window.innerHeight), 1);
+      }
+      
       horizontalContainer.style.transform = `translateX(-${progress * maxTranslate}px)`;
     });
   </script>
