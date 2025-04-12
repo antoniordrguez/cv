@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Desplazamiento Horizontal con Difuminado en Laterales</title>
+  <title>Desplazamiento Horizontal con Mask y Gap en Scroll</title>
   <style>
     /* Reset y estilos básicos */
     * {
@@ -22,18 +22,18 @@
       align-items: center;
       background: #f0f0f0;
     }
-    /* Sección de scroll: se extiende la altura para permitir el efecto vertical */
+    /* Sección extendida para generar el espacio de scroll vertical */
     .scroll-section {
       position: relative;
       height: 400vh; /* Ajusta este valor según la cantidad de bloques */
     }
-    /* Contenedor sticky que permanecerá fijo en la ventana mientras se desplaza la sección */
+    /* Contenedor sticky que permanece fijo durante el scroll en la sección */
     .sticky-container {
       position: sticky;
       top: 0;
       height: 100vh;
       overflow: hidden;
-      /* Máscara para difuminar los laterales: solo el centro se ve completamente */
+      /* Máscara para difuminar los laterales: solo el centro se ve nítido */
       -webkit-mask-image: linear-gradient(to right, transparent 15%, black 50%, transparent 85%);
       mask-image: linear-gradient(to right, transparent 15%, black 50%, transparent 85%);
       -webkit-mask-size: 100% 100%;
@@ -41,7 +41,7 @@
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
     }
-    /* Contenedor horizontal que se desplazará en función del scroll vertical */
+    /* Contenedor horizontal que se desplazará según el scroll vertical */
     .horizontal-container {
       display: flex;
       height: 100%;
@@ -65,7 +65,7 @@
     <h1>Contenido Superior</h1>
   </div>
 
-  <!-- Sección de desplazamiento horizontal controlado por scroll vertical -->
+  <!-- Sección del efecto con desplazamiento horizontal -->
   <section class="scroll-section">
     <div class="sticky-container">
       <div class="horizontal-container" id="horizontal-container">
@@ -86,20 +86,38 @@
     const horizontalContainer = document.getElementById('horizontal-container');
     const scrollSection = document.querySelector('.scroll-section');
 
-    // Calculamos el máximo desplazamiento horizontal:
-    // Es la diferencia entre el ancho total del contenido y el ancho del viewport.
+    // Calculamos el máximo desplazamiento horizontal: 
+    // diferencia entre el ancho total del contenido y el ancho del viewport.
     const totalWidth = horizontalContainer.scrollWidth;
     const maxTranslate = totalWidth - window.innerWidth;
+
+    // Definimos los umbrales del "gap" en el scroll:
+    // gapStart: porcentaje de scroll para no iniciar el desplazamiento horizontal
+    // gapEnd: porcentaje de scroll a partir del cual se completa el efecto.
+    const gapStart = 0.20; // 20%
+    const gapEnd   = 0.80; // 80%
 
     window.addEventListener('scroll', () => {
       const sectionRect = scrollSection.getBoundingClientRect();
       let progress = 0;
-      // Solo se calcula el progreso cuando la sección ya está en el viewport (o sobrepasó el tope)
+      
+      // Calculamos el progreso solo cuando la sección se ha fijado (o supera el tope del viewport)
       if (sectionRect.top <= 0) {
         progress = Math.min(Math.abs(sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 1);
       }
-      // Se actualiza el transform para desplazar el contenedor horizontalmente
-      horizontalContainer.style.transform = `translateX(-${progress * maxTranslate}px)`;
+      
+      // Se aplica el gap: sin desplazamiento antes del 20% y sin cambios tras el 80%
+      let effectiveProgress = 0;
+      if (progress < gapStart) {
+        effectiveProgress = 0;
+      } else if (progress > gapEnd) {
+        effectiveProgress = 1;
+      } else {
+        effectiveProgress = (progress - gapStart) / (gapEnd - gapStart);
+      }
+      
+      // Se actualiza el transform para desplazar horizontalmente el contenedor
+      horizontalContainer.style.transform = `translateX(-${effectiveProgress * maxTranslate}px)`;
     });
   </script>
 </body>
