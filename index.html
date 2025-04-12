@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Bloque Centrado con Fade Lateral y Gaps en Scroll</title>
+  <title>Bloque Centrado con Borde Fijo, Fade Lateral y Gaps en Scroll</title>
   <style>
     /* RESET BÁSICO Y CONFIGURACIÓN GENERAL */
     * {
@@ -21,7 +21,6 @@
       align-items: center;
       background: #f0f0f0;
     }
-
     /* SECCIÓN DE SCROLL */
     .scroll-section {
       position: relative;
@@ -46,19 +45,17 @@
       z-index: 10;
       background: white;
     }
-
-    /* Wrapper para los bloques: delimita la “ventana” central */
+    /* Wrapper central (ventana) que define el área donde se muestra el bloque activo */
     .blocks-wrapper {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 60vw;     /* El ancho de la "ventana" donde el bloque aparece nítido */
-      height: 60vh;    /* Altura fija para el bloque */
-      overflow: hidden; /* Oculta lo que se sale del área */
+      width: 60vw;     /* Ancho del área central */
+      height: 60vh;    /* Alto del área central */
+      overflow: hidden;
     }
-
-    /* Contenedor horizontal que se moverá con scroll vertical */
+    /* Contenedor horizontal que se desplazará con el scroll vertical */
     .horizontal-container {
       display: flex;
       height: 100%;
@@ -76,14 +73,13 @@
       font-size: 1.5rem;
       border-right: 1px solid #fff;
     }
-
     /* Overlays de fade (difuminado) en los laterales del wrapper */
     .fade-overlay {
       position: absolute;
       top: 0;
       width: 15%; /* Ajusta este porcentaje según el efecto deseado */
       height: 100%;
-      pointer-events: none; /* No interfiere con el scroll */
+      pointer-events: none;
       z-index: 5;
     }
     .fade-overlay.left {
@@ -94,6 +90,22 @@
       right: 0;
       background: linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0));
     }
+    /* BORDES FIJOS para separar el bloque central de las áreas difuminadas */
+    .fixed-border {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 5px; /* Grosor del borde (ajusta según prefieras) */
+      height: 60vh; /* Igual al alto del wrapper */
+      background-color: #fff; /* Color del borde */
+      z-index: 12;
+    }
+    .fixed-border.left {
+      left: calc(50% - 30vw); /* 30vw = la mitad de 60vw, es decir, la izquierda del wrapper */
+    }
+    .fixed-border.right {
+      right: calc(50% - 30vw);
+    }
   </style>
 </head>
 <body>
@@ -102,27 +114,29 @@
     <h1>Contenido Superior</h1>
   </div>
 
-  <!-- Sección con el título fijo y bloques móviles -->
+  <!-- Sección con título fijo, bloques móviles y bordes fijos -->
   <section class="scroll-section">
     <div class="sticky-container">
-
-      <!-- Título fijo -->
+      <!-- Título fijo que permanece en la parte superior -->
       <h1 class="section-title">TÍTULO DE LA SECCIÓN</h1>
 
-      <!-- Wrapper central que define la "ventana" del bloque activo -->
+      <!-- Wrapper central que delimita la ventana de visualización del bloque activo -->
       <div class="blocks-wrapper">
-        <!-- Contenedor que se moverá horizontalmente -->
+        <!-- Contenedor horizontal que se desplazará -->
         <div class="horizontal-container" id="horizontal-container">
           <div class="block">Bloque 1: Texto de ejemplo</div>
           <div class="block">Bloque 2: Texto de ejemplo</div>
           <div class="block">Bloque 3: Texto de ejemplo</div>
           <div class="block">Bloque 4: Texto de ejemplo</div>
         </div>
-        <!-- Overlays para crear efecto de difuminado en los laterales -->
+        <!-- Overlays para el efecto de difuminado en los laterales -->
         <div class="fade-overlay left"></div>
         <div class="fade-overlay right"></div>
       </div>
 
+      <!-- Bordes fijos a ambos lados de la ventana central -->
+      <div class="fixed-border left"></div>
+      <div class="fixed-border right"></div>
     </div>
   </section>
 
@@ -131,19 +145,17 @@
   </div>
 
   <script>
-    /* CONFIGURACIÓN Y CÁLCULO DE SCROLL */
+    /* CONFIGURACIÓN Y CÁLCULO DEL SCROLL */
     const scrollSection = document.querySelector('.scroll-section');
     const horizontalContainer = document.getElementById('horizontal-container');
     const numBlocks = horizontalContainer.children.length;
-
-    // Se medirá el ancho del wrapper (la "ventana" centrada) para calcular el desplazamiento
     const blocksWrapper = document.querySelector('.blocks-wrapper');
-    
-    // GAP GENERAL en el scroll vertical (para que no inicie ni finalice inmediatamente)
-    const overallGapStart = 0.20; // 20%
-    const overallGapEnd   = 0.80; // 80%
 
-    // GAP LOCAL: cada transición entre bloques tendrá una "zona muerta"
+    // GAP GENERAL en el scroll vertical: evita que el movimiento horizontal inicie o finalice inmediatamente
+    const overallGapStart = 0.10; // 20%
+    const overallGapEnd   = 0.90; // 80%
+
+    // GAP LOCAL: cada transición entre bloques tendrá una zona "muerta"
     const localGapStart = 0.3; // 30% del segmento
     const localGapEnd   = 0.7; // 70% del segmento
 
@@ -153,7 +165,8 @@
       if (sectionRect.top <= 0) {
         progress = Math.min(Math.abs(sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 1);
       }
-      // 1) GAP GENERAL: controla cuándo inicia y termina el movimiento horizontal global
+
+      // 1) Aplicar GAP GENERAL para que el desplazamiento horizontal no inicie ni finalice de inmediato
       let overallProgress = 0;
       if (progress < overallGapStart) {
         overallProgress = 0;
@@ -162,13 +175,15 @@
       } else {
         overallProgress = (progress - overallGapStart) / (overallGapEnd - overallGapStart);
       }
-      // 2) Dividir en segmentos correspondientes a cada transición entre bloques
+
+      // 2) Dividir el progreso en segmentos para cada transición entre bloques
       const numTransitions = numBlocks - 1;
       const segmentLength = 1 / numTransitions;
       let segmentIndex = Math.floor(overallProgress / segmentLength);
       if (segmentIndex >= numTransitions) segmentIndex = numTransitions - 1;
       let localProgress = (overallProgress - segmentIndex * segmentLength) / segmentLength;
-      // 3) GAP LOCAL: dentro de cada segmento se define una zona en la que el bloque se mantiene fijo
+
+      // 3) Aplicar GAP LOCAL: en cada segmento, se define una zona sin movimiento
       let interp = 0;
       if (localProgress < localGapStart) {
         interp = 0;
@@ -178,7 +193,8 @@
         interp = (localProgress - localGapStart) / (localGapEnd - localGapStart);
       }
       const effectiveIndex = segmentIndex + interp;
-      // 4) Calcular el desplazamiento horizontal: cada bloque ocupa el ancho del wrapper
+
+      // 4) Calcular el desplazamiento horizontal en función del ancho del wrapper
       const blockWidth = blocksWrapper.offsetWidth;
       const translateX = effectiveIndex * blockWidth;
       horizontalContainer.style.transform = `translateX(-${translateX}px)`;
