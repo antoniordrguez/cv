@@ -11,23 +11,33 @@
 }
 
 
-/* Contenedor horizontal */
-.horizontal-scroll-container {
-  display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
-  /* Oculta la scrollbar en Firefox */
-  scrollbar-width: none;
+/* Sección anclada que ocupa la pantalla completa */
+.gallery-section {
+  position: relative;
+  height: 100vh;       /* Ocupa el 100% de la altura de la ventana */
+  overflow: hidden;    /* Oculta el scroll nativo */
 }
-/* Oculta la scrollbar en Webkit (Chrome, Safari, etc.) */
-.horizontal-scroll-container::-webkit-scrollbar {
+
+/* Contenedor de la galería que se desplazará horizontalmente */
+.styles-gallery {
+  display: flex;
+  height: 100%;
+  /* Ajusta el ancho para que contenga todos los elementos en fila. 
+     Puede ser un ancho fijo, o calcularse dinámicamente en función del número de elementos. */
+  width: 300%;  
+  overflow-x: scroll;     
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  /* Ocultar la scrollbar en la mayoría de navegadores */
+  scrollbar-width: none;           /* Firefox */
+}
+.styles-gallery::-webkit-scrollbar { /* Chrome, Safari, Opera */
   display: none;
 }
 
-/* Define el ancho de cada bloque: puede ser 100% o un ancho fijo, según tu diseño */
-.horizontal-scroll-block {
-  flex: 0 0 100%;
-  /* Puedes ajustar el padding y margin según prefieras */
+/* Opcional: estilos para los bloques (puedes ajustar el ancho según tus necesidades) */
+.styles-list .content-group {
+  flex: 0 0 33.33%;  /* Si tienes 3 bloques, cada uno ocupa un tercio */
   padding: 1rem;
 }
 

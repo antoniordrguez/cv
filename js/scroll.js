@@ -97,31 +97,32 @@ lenis.on('scroll', () => {
 // --- HORIZONTAL SCROLL --- //
 // ------------------------- //
 document.addEventListener('DOMContentLoaded', function() {
-  // Configuración general para todos los contenedores que usen scroll horizontal
-  setupHorizontalScroll();
+  // Selecciona todas las secciones que necesiten el efecto de scroll horizontal
+  const gallerySections = document.querySelectorAll('.gallery-section');
+
+  gallerySections.forEach(section => {
+    // Suponemos que cada sección tiene internamente un contenedor con la clase .styles-gallery
+    const gallery = section.querySelector('.styles-gallery');
+    if (gallery) {
+      section.addEventListener('wheel', function(e) {
+        const maxScrollLeft = gallery.scrollWidth - gallery.clientWidth;
+
+        // Si se detecta scroll hacia abajo y aún no se ha llegado al final
+        if (e.deltaY > 0 && gallery.scrollLeft < maxScrollLeft) {
+          e.preventDefault(); // Evita que se realice el scroll vertical
+          gallery.scrollLeft += e.deltaY; // Mueve el scroll horizontal
+          return;
+        }
+        // Si se detecta scroll hacia arriba y aún no se ha llegado al principio
+        else if (e.deltaY < 0 && gallery.scrollLeft > 0) {
+          e.preventDefault();
+          gallery.scrollLeft += e.deltaY;
+          return;
+        }
+        // Si el contenedor horizontal ya está al inicio o al final,
+        // se permite que el scroll vertical "salga" de esta sección.
+      }, { passive: false });
+    }
+  });
 });
 
-function setupHorizontalScroll() {
-  // Selecciona todos los contenedores que tengan la clase 'horizontal-scroll-container'
-  const horizontalContainers = document.querySelectorAll('.horizontal-scroll-container');
-  
-  horizontalContainers.forEach(container => {
-    container.addEventListener('wheel', function(e) {
-      // Calcula la cantidad máxima de scroll horizontal para el contenedor
-      const maxScrollLeft = container.scrollWidth - container.clientWidth;
-      
-      // Si se detecta scroll hacia abajo y aún no se ha llegado al final del contenido
-      if (e.deltaY > 0 && container.scrollLeft < maxScrollLeft) {
-        e.preventDefault();
-        container.scrollLeft += e.deltaY;
-      }
-      // Si se detecta scroll hacia arriba y aún no se ha llegado al inicio del contenido
-      else if (e.deltaY < 0 && container.scrollLeft > 0) {
-        e.preventDefault();
-        container.scrollLeft += e.deltaY;
-      }
-      // Si el contenedor ya está completamente desplazado (inicio o fin),
-      // se permite el comportamiento de scroll vertical normal en la página.
-    }, { passive: false });
-  });
-}
