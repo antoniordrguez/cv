@@ -2,62 +2,61 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Efecto de Transición con Fade y Máscara</title>
+  <title>Desplazamiento Horizontal con Difuminado en Laterales</title>
   <style>
-    /* Estilos básicos */
+    /* Reset y estilos básicos */
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
       background-color: #fff;
     }
-    /* Espaciadores para ver contenido antes y después */
+    /* Espaciadores para simular contenido antes y después */
     .spacer {
       height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       background: #f0f0f0;
     }
-    /* Sección con altura extendida para generar el espacio de scroll */
+    /* Sección de scroll: se extiende la altura para permitir el efecto vertical */
     .scroll-section {
       position: relative;
-      height: 400vh; /* Ajusta este valor según tus necesidades */
+      height: 400vh; /* Ajusta este valor según la cantidad de bloques */
     }
-    /* Contenedor sticky que se mantiene fijo durante el scroll */
+    /* Contenedor sticky que permanecerá fijo en la ventana mientras se desplaza la sección */
     .sticky-container {
       position: sticky;
       top: 0;
       height: 100vh;
       overflow: hidden;
-      /* Máscara para difuminar los bordes izquierdo y derecho */
-      -webkit-mask-image: linear-gradient(to right, transparent 10%, black 20%, black 80%, transparent 90%);
-      mask-image: linear-gradient(to right, transparent 10%, black 20%, black 80%, transparent 90%);
+      /* Máscara para difuminar los laterales: solo el centro se ve completamente */
+      -webkit-mask-image: linear-gradient(to right, transparent 15%, black 50%, transparent 85%);
+      mask-image: linear-gradient(to right, transparent 15%, black 50%, transparent 85%);
       -webkit-mask-size: 100% 100%;
       mask-size: 100% 100%;
       -webkit-mask-repeat: no-repeat;
       mask-repeat: no-repeat;
     }
-    /* Contenedor para posicionar los párrafos */
+    /* Contenedor horizontal que se desplazará en función del scroll vertical */
     .horizontal-container {
-      position: relative;
-      width: 100%;
+      display: flex;
       height: 100%;
+      transition: transform 0.1s ease-out;
     }
-    /* Cada párrafo se posiciona absolutamente en el centro */
+    /* Cada párrafo se muestra como un bloque de ancho completo (100vw) */
     .horizontal-container p {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2em;
-      padding: 20px;
+      min-width: 100vw;
       margin: 0;
-      background: #ddd;
-      width: 80%;
+      padding: 20px;
+      font-size: 2em;
       text-align: center;
-      opacity: 0;
-      transition: opacity 0.3s ease-out;
+      background-color: #ddd;
+      border-right: 1px solid #fff;
+      flex-shrink: 0;
     }
   </style>
 </head>
@@ -66,7 +65,7 @@
     <h1>Contenido Superior</h1>
   </div>
 
-  <!-- Sección del efecto de transición -->
+  <!-- Sección de desplazamiento horizontal controlado por scroll vertical -->
   <section class="scroll-section">
     <div class="sticky-container">
       <div class="horizontal-container" id="horizontal-container">
@@ -83,45 +82,24 @@
   </div>
 
   <script>
-    // Selección de elementos
+    // Seleccionamos el contenedor horizontal y la sección de scroll
     const horizontalContainer = document.getElementById('horizontal-container');
     const scrollSection = document.querySelector('.scroll-section');
-    const paragraphs = horizontalContainer.querySelectorAll('p');
-    const numBlocks = paragraphs.length;
 
-    // Definición de gaps para que el efecto no inicie ni finalice de inmediato
-    const gapStart = 0.20; // 20% del scroll en la sección para iniciar la transición
-    const gapEnd = 0.80;   // 80% para completar la transición
+    // Calculamos el máximo desplazamiento horizontal:
+    // Es la diferencia entre el ancho total del contenido y el ancho del viewport.
+    const totalWidth = horizontalContainer.scrollWidth;
+    const maxTranslate = totalWidth - window.innerWidth;
 
     window.addEventListener('scroll', () => {
-      // Se obtiene la posición de la sección respecto al viewport
       const sectionRect = scrollSection.getBoundingClientRect();
       let progress = 0;
-      // Solo se calcula el progreso cuando la parte superior de la sección está en (o sobre) el tope del viewport
+      // Solo se calcula el progreso cuando la sección ya está en el viewport (o sobrepasó el tope)
       if (sectionRect.top <= 0) {
         progress = Math.min(Math.abs(sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 1);
       }
-      
-      // Se aplica el gap al efecto: sin transición antes del 20% y sin cambios tras el 80%
-      let effectiveProgress = 0;
-      if (progress < gapStart) {
-        effectiveProgress = 0;
-      } else if (progress > gapEnd) {
-        effectiveProgress = 1;
-      } else {
-        effectiveProgress = (progress - gapStart) / (gapEnd - gapStart);
-      }
-      
-      // Se mapea el progreso efectivo a un índice continuo entre 0 y (numBlocks - 1)
-      const continuousIndex = effectiveProgress * (numBlocks - 1);
-      
-      // Para cada párrafo, se calcula la diferencia con el índice central y se ajusta su opacidad
-      paragraphs.forEach((p, i) => {
-        const diff = Math.abs(i - continuousIndex);
-        // El párrafo más centrado (diferencia 0) tendrá opacidad 1 y los demás se desvanecerán proporcionalmente
-        const opacity = Math.max(1 - diff, 0);
-        p.style.opacity = opacity;
-      });
+      // Se actualiza el transform para desplazar el contenedor horizontalmente
+      horizontalContainer.style.transform = `translateX(-${progress * maxTranslate}px)`;
     });
   </script>
 </body>
