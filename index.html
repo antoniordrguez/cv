@@ -2,15 +2,15 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Efecto Scroll Horizontal con Gap al Inicio y Final</title>
+  <title>Efecto Fade entre Párrafos en Scroll</title>
   <style>
-    /* Reset y estilos básicos */
+    /* Estilos básicos */
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
     }
-    /* Contenido para ver antes y después */
+    /* Contenido antes y después para notar el scroll */
     .spacer {
       height: 100vh;
       display: flex;
@@ -18,35 +18,38 @@
       align-items: center;
       background: #f0f0f0;
     }
-    /* Sección de scroll: la altura debe ser proporcional al ancho total del contenido */
+    /* Sección del scroll: la altura extendida crea el espacio para el efecto */
     .scroll-section {
       position: relative;
-      /* Con 4 párrafos de 100vw cada uno, 400vh es suficiente */
-      height: 400vh;
+      height: 400vh; /* Ajusta este valor según el efecto deseado */
     }
-    /* Contenedor sticky que permanece fijo durante el scroll en la sección */
+    /* Contenedor sticky que se queda fijo en la ventana durante el scroll */
     .sticky-container {
       position: sticky;
       top: 0;
       height: 100vh;
       overflow: hidden;
     }
-    /* Contenedor horizontal que se desplaza internamente */
+    /* Contenedor relativo para posicionar cada bloque en el centro */
     .horizontal-container {
-      display: flex;
+      position: relative;
+      width: 100%;
       height: 100%;
-      transition: transform 0.1s ease-out;
     }
-    /* Cada párrafo ocupa el 100vw y está separado visualmente */
+    /* Cada párrafo se posiciona de forma absoluta en el centro */
     .horizontal-container p {
-      min-width: 100vw;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2em;
       margin: 0;
       padding: 20px;
-      box-sizing: border-box;
-      font-size: 1.5em;
-      text-align: center;
       background: #ddd;
-      border-right: 1px solid #fff;
+      width: 80%;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.3s ease-out;
     }
   </style>
 </head>
@@ -55,7 +58,7 @@
     <h1>Contenido Superior</h1>
   </div>
 
-  <!-- Sección del efecto de scroll horizontal -->
+  <!-- Sección con efecto de fade entre bloques -->
   <section class="scroll-section">
     <div class="sticky-container">
       <div class="horizontal-container" id="horizontal-container">
@@ -74,30 +77,23 @@
   <script>
     const horizontalContainer = document.getElementById('horizontal-container');
     const scrollSection = document.querySelector('.scroll-section');
+    const paragraphs = horizontalContainer.querySelectorAll('p');
+    const numBlocks = paragraphs.length;
 
-    // Calcula el máximo desplazamiento horizontal: diferencia entre el ancho total del contenido y el ancho del viewport
-    const totalWidth = horizontalContainer.scrollWidth;
-    const maxTranslate = totalWidth - window.innerWidth;
-
-    // Definición de los gaps
-    // gapStart: progreso mínimo (porcentaje) de scroll dentro de la sección para iniciar la traslación
-    // gapEnd: porcentaje en que se completa la traslación
+    // Definimos los "gaps": el desplazamiento horizontal (o en este caso, el fade) no comienza hasta un 20% del scroll, y no se completa hasta un 80%.
     const gapStart = 0.20; // 20%
     const gapEnd = 0.80;   // 80%
 
     window.addEventListener('scroll', () => {
       const sectionRect = scrollSection.getBoundingClientRect();
       let progress = 0;
-      
-      // Se calcula el progreso sólo cuando la sección ya está fijada (arriba del viewport)
+
+      // Calculamos el progreso solo cuando la sección ha llegado a la parte superior del viewport.
       if (sectionRect.top <= 0) {
         progress = Math.min(Math.abs(sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 1);
       }
-      
-      // Se aplica el gap:
-      // - Hasta el 20% de progreso, no se desplaza horizontalmente.
-      // - Entre 20% y 80% se incrementa linealmente.
-      // - Por encima del 80% se mantiene en 1, dejando el gap final.
+
+      // Aplicamos los gaps para que el efecto de fade no se active inmediatamente al entrar ni se complete al final.
       let effectiveProgress = 0;
       if (progress < gapStart) {
         effectiveProgress = 0;
@@ -106,9 +102,17 @@
       } else {
         effectiveProgress = (progress - gapStart) / (gapEnd - gapStart);
       }
-      
-      // Se aplica la transformación horizontal
-      horizontalContainer.style.transform = `translateX(-${effectiveProgress * maxTranslate}px)`;
+
+      // Convertimos el progreso efectivo en un índice continuo (de 0 a numBlocks - 1)
+      const continuousIndex = effectiveProgress * (numBlocks - 1);
+
+      // Para cada párrafo, calculamos la diferencia respecto al índice continuo y ajustamos su opacidad
+      paragraphs.forEach((p, i) => {
+        const diff = Math.abs(i - continuousIndex);
+        // Usamos una transición lineal: el párrafo con diferencia 0 tendrá opacidad 1, mientras que si la diferencia es 1, tendrá opacidad 0.
+        const opacity = Math.max(1 - diff, 0);
+        p.style.opacity = opacity;
+      });
     });
   </script>
 </body>
