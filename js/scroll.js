@@ -1,6 +1,8 @@
 // js/scroll.js
 
-// Esperar a que la página cargue para refrescar AOS al inicio
+// ------------------------- //
+// ---- VERTICAL SCROLL ---- //
+// ------------------------- //
 window.addEventListener('load', () => {
   if (window.AOS) AOS.refresh();
 });
@@ -89,3 +91,37 @@ lenis.on('scroll', () => {
     }
   }, 250);
 });
+
+
+// ------------------------- //
+// --- HORIZONTAL SCROLL --- //
+// ------------------------- //
+document.addEventListener('DOMContentLoaded', function() {
+  // Configuración general para todos los contenedores que usen scroll horizontal
+  setupHorizontalScroll();
+});
+
+function setupHorizontalScroll() {
+  // Selecciona todos los contenedores que tengan la clase 'horizontal-scroll-container'
+  const horizontalContainers = document.querySelectorAll('.horizontal-scroll-container');
+  
+  horizontalContainers.forEach(container => {
+    container.addEventListener('wheel', function(e) {
+      // Calcula la cantidad máxima de scroll horizontal para el contenedor
+      const maxScrollLeft = container.scrollWidth - container.clientWidth;
+      
+      // Si se detecta scroll hacia abajo y aún no se ha llegado al final del contenido
+      if (e.deltaY > 0 && container.scrollLeft < maxScrollLeft) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY;
+      }
+      // Si se detecta scroll hacia arriba y aún no se ha llegado al inicio del contenido
+      else if (e.deltaY < 0 && container.scrollLeft > 0) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY;
+      }
+      // Si el contenedor ya está completamente desplazado (inicio o fin),
+      // se permite el comportamiento de scroll vertical normal en la página.
+    }, { passive: false });
+  });
+}
