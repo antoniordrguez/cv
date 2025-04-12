@@ -11,33 +11,30 @@
 }
 
 
-/* Sección anclada que ocupa la pantalla completa */
+/* Estilos para la sección de experiencia tipo Apple */
 .gallery-section {
   position: relative;
-  height: 100vh;       /* Ocupa el 100% de la altura de la ventana */
-  overflow: hidden;    /* Oculta el scroll nativo */
+  height: 100vh;
+  overflow: hidden;
 }
-
-/* Contenedor de la galería que se desplazará horizontalmente */
 .styles-gallery {
   display: flex;
   height: 100%;
-  /* Ajusta el ancho para que contenga todos los elementos en fila. 
-     Puede ser un ancho fijo, o calcularse dinámicamente en función del número de elementos. */
-  width: 300%;  
-  overflow-x: scroll;     
+  width: 200%; /* Ajusta según cantidad de bloques; aquí se esperan 2 bloques */
+  overflow-x: scroll;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  /* Ocultar la scrollbar en la mayoría de navegadores */
-  scrollbar-width: none;           /* Firefox */
+  scrollbar-width: none; /* Firefox */
 }
-.styles-gallery::-webkit-scrollbar { /* Chrome, Safari, Opera */
-  display: none;
+.styles-gallery::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
-
-/* Opcional: estilos para los bloques (puedes ajustar el ancho según tus necesidades) */
-.styles-list .content-group {
-  flex: 0 0 33.33%;  /* Si tienes 3 bloques, cada uno ocupa un tercio */
+.content-group {
+  display: flex;
+  width: 100%;
+}
+.experience-item {
+  flex: 0 0 100%;
   padding: 1rem;
 }
 

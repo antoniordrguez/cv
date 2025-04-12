@@ -97,32 +97,26 @@ lenis.on('scroll', () => {
 // --- HORIZONTAL SCROLL --- //
 // ------------------------- //
 document.addEventListener('DOMContentLoaded', function() {
-  // Selecciona todas las secciones que necesiten el efecto de scroll horizontal
-  const gallerySections = document.querySelectorAll('.gallery-section');
-
-  gallerySections.forEach(section => {
-    // Suponemos que cada sección tiene internamente un contenedor con la clase .styles-gallery
-    const gallery = section.querySelector('.styles-gallery');
+  const experienceSection = document.getElementById('experience');
+  if (experienceSection) {
+    const gallery = experienceSection.querySelector('.styles-gallery');
     if (gallery) {
-      section.addEventListener('wheel', function(e) {
+      experienceSection.addEventListener('wheel', function(e) {
         const maxScrollLeft = gallery.scrollWidth - gallery.clientWidth;
-
-        // Si se detecta scroll hacia abajo y aún no se ha llegado al final
+        // Si hay scroll hacia abajo y aún queda contenido horizontal:
         if (e.deltaY > 0 && gallery.scrollLeft < maxScrollLeft) {
-          e.preventDefault(); // Evita que se realice el scroll vertical
-          gallery.scrollLeft += e.deltaY; // Mueve el scroll horizontal
+          e.preventDefault();
+          gallery.scrollLeft += e.deltaY;
           return;
         }
-        // Si se detecta scroll hacia arriba y aún no se ha llegado al principio
+        // Si hay scroll hacia arriba y aún queda contenido para desplazar a la izquierda:
         else if (e.deltaY < 0 && gallery.scrollLeft > 0) {
           e.preventDefault();
           gallery.scrollLeft += e.deltaY;
           return;
         }
-        // Si el contenedor horizontal ya está al inicio o al final,
-        // se permite que el scroll vertical "salga" de esta sección.
+        // De lo contrario, se permite el scroll vertical normal para salir de la sección.
       }, { passive: false });
     }
-  });
+  }
 });
-
