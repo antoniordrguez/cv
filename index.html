@@ -1,232 +1,86 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Antonio - CV</title>
+<head>
+  <meta charset="UTF-8">
+  <title>Efecto de scroll horizontal con párrafos</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      /* Se extiende el scroll para poder apreciar el efecto */
+      height: 200vh;
+    }
+    /* Sección que contiene el efecto */
+    .scroll-section {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* Contenedor horizontal que se mantendrá fijo (sticky) durante el scroll */
+    .horizontal-container {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      /* Para que el contenido se muestre en una línea horizontal */
+      white-space: nowrap;
+      will-change: transform;
+      transition: transform 0.1s ease-out;
+    }
+    /* Estilos para cada párrafo */
+    .horizontal-container p {
+      font-size: 1.8em;
+      margin: 0 2em;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <!-- Contenido antes de la sección para notar el scroll -->
+  <div style="height: 50vh; display: flex; justify-content: center; align-items: center;">
+    <h1>Contenido Inicial</h1>
+  </div>
 
-    <!-- Tailwind (CDN) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: '#003366',
-              lightgray: '#f9f9f9'
-            }
-          }
-        }
-      }
-    </script>
+  <!-- Sección del efecto -->
+  <section class="scroll-section">
+    <div class="horizontal-container" id="horizontal-container">
+      <p>Párrafo 1: Este es el primer párrafo que se desplaza horizontalmente.</p>
+      <p>Párrafo 2: Otro párrafo para demostrar el efecto.</p>
+      <p>Párrafo 3: Continúa el desplazamiento con contenido interesante.</p>
+      <p>Párrafo 4: Concluye el efecto con este texto final.</p>
+    </div>
+  </section>
 
-    <!-- CSS de AOS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
+  <!-- Contenido posterior para completar el scroll -->
+  <div style="height: 150vh; display: flex; justify-content: center; align-items: center;">
+    <h1>Contenido Final</h1>
+  </div>
 
-    <!-- CSS de botones, estilos, tipografías, highlight (si lo usas) -->
-    <link rel="stylesheet" href="css/button.css">
-    <link rel="stylesheet" href="css/styles.css" />
-    <!-- Se puede desactivar arrows.css si solo lo usaba para las flechas -->
-    <!-- <link rel="stylesheet" href="css/arrows.css" /> -->
-    <link rel="stylesheet" href="css/typography.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github-dark.css" />
-
-    <!-- Estilos personalizados para el scroll horizontal en "Experiencia" -->
-    <style>
-      /* Evitamos conflictos con scroll-behavior si se usa Lenis */
-      /*
-      html {
-        scroll-behavior: smooth;
-      }
-      */
-
-      body {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-        /* Para evitar scroll duplicado */
-        overflow: hidden;
-      }
-
-      /* Estilos para la sección de experiencia con scroll horizontal */
-      .horizontal-scroll-container {
-        display: flex;
-        overflow-x: auto;
-        overflow-y: hidden;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch; /* Suavidad en móviles */
-      }
-      .experience-block {
-        flex: 0 0 100%;
-        scroll-snap-align: start;
-        padding: 1rem;
-      }
-    </style>
-  </head>
-
-  <body class="bg-lightgray text-gray-800 font-sans">
-    <!-- Navbar fijo arriba -->
-    <nav class="fixed top-0 left-0 w-full h-16 bg-[#1D1D1F] text-white shadow-md z-50 flex items-center">
-      <div class="max-w-6xl mx-auto px-4 w-full flex items-center justify-between">
-        <div class="font-semibold text-lg">ANTONIO</div>
-        <ul class="flex space-x-6 text-base">
-          <li><a href="#hero" class="hover:underline">Inicio</a></li>
-          <li><a href="#about" class="hover:underline">Acerca de mí</a></li>
-          <li><a href="#experience" class="hover:underline">Experiencia</a></li>
-          <li><a href="#education" class="hover:underline">Educación</a></li>
-          <li><a href="#skills" class="hover:underline">Habilidades</a></li>
-          <li><a href="#contact" class="hover:underline">Contacto</a></li>
-        </ul>
-      </div>
-    </nav>
-
-    <!-- Contenedor principal con overflow para scroll manual -->
-    <main id="scroll-container" class="absolute top-16 left-0 right-0 bottom-16 overflow-y-scroll">
-      <div>
-        <!-- Hero Section (sin flechas) -->
-        <section id="hero" class="h-screen px-6 bg-white flex items-center justify-center" data-aos="fade-right">
-          <div class="max-w-6xl w-full flex flex-col md:flex-row items-center md:items-start">
-            <!-- Columna de texto -->
-            <div class="w-full md:w-1/2 md:pr-8 flex flex-col items-center md:items-start text-center md:text-left">
-              <h1 class="text-5xl font-bold" id="hero-name">ANTONIO JOSÉ RODRÍGUEZ NEVADO</h1>
-              <p class="mt-4 text-xl" id="hero-role">Data Engineer | Data Scientist | Data Analyst</p>
-              <!-- Fila de botones -->
-              <div class="flex flex-row space-x-4 mt-8">
-                <a href="#contact" class="button2 button2-orange">Contact</a>
-                <a href="assets/cv/cv_antonio.pdf" class="button2 button2-turquoise" download>Download CV</a>
-              </div>
-            </div>
-            <!-- Columna de imagen -->
-            <div class="w-full md:w-1/2 mt-10 md:mt-0 flex justify-center md:justify-end" data-aos="fade-left">
-              <img src="assets/images/me.png" alt="Foto de Antonio" class="rounded-full h-64 w-64 object-cover shadow-lg float-anim">
-            </div>
-          </div>
-        </section>
-
-        <!-- About Section (sin flechas) -->
-        <section id="about" class="h-screen px-6 bg-lightgray flex items-center justify-center" data-aos="fade-up">
-          <div class="max-w-4xl mx-auto prose">
-            <h2 class="text-3xl font-bold mb-6">Acerca de mí</h2>
-            <p>
-              Soy un Data Analyst con más de dos años de experiencia en proyectos de análisis, ingeniería y ciencia de datos. Domino herramientas como <strong>Python</strong>, <strong>SQL</strong>, <strong>Spark</strong> y <strong>AWS</strong>. Me caracterizo por ser proactivo, autodidacta, y tener una fuerte orientación a resultados.
-            </p>
-            <h3>Puntos clave</h3>
-            <ul>
-              <li>Trabajo en equipo</li>
-              <li>Aprendizaje continuo</li>
-              <li>Foco en resultados</li>
-            </ul>
-          </div>
-        </section>
-
-        <!-- Experience Section -->
-        <section id="experience" class="gallery-section">
-          <div class="max-w-5xl mx-auto w-full">
-            <!-- Título fijo -->
-            <h2 style="margin:1rem 0; font-size: 2rem;">Experiencia</h2>
-            <!-- Contenedor horizontal -->
-            <div class="styles-gallery">
-              <div class="content-group">
-                <!-- Bloque 1 -->
-                <div class="experience-item">
-                  <h3>Data Analyst | Endesa X</h3>
-                  <p><strong>Años:</strong> 2022 - Presente</p>
-                  <ul>
-                    <li>Análisis de datos, ETL, modelos predictivos, dashboards</li>
-                    <li>Bases de datos SQL y NoSQL</li>
-                  </ul>
-                </div>
-                <!-- Bloque 2 -->
-                <div class="experience-item">
-                  <h3>Data Engineer | Otra empresa</h3>
-                  <p><strong>Años:</strong> 2021 - 2022</p>
-                  <ul>
-                    <li>Pipelines en AWS (Glue, S3, Lambda)</li>
-                    <li>Optimización de consultas SQL</li>
-                    <li>Procesamiento en tiempo real con Kafka</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Education Section (sin flechas) -->
-        <section id="education" class="h-screen px-6 bg-lightgray flex items-center justify-center" data-aos="fade-up">
-          <div class="max-w-4xl mx-auto prose">
-            <h2 class="text-3xl font-bold mb-6">Educación</h2>
-            <h3>Máster en Big Data, Data Science &amp; AI</h3>
-            <p>Universidad Complutense de Madrid (2024 - 2025)</p>
-            <ul>
-              <li>Asignaturas principales: Machine Learning, Big Data, HPC, etc.</li>
-              <li>Proyecto de fin de máster en Computer Vision.</li>
-            </ul>
-          </div>
-        </section>
-
-        <!-- Skills Section (sin flechas) -->
-        <section id="skills" class="h-screen px-6 bg-white flex items-center justify-center" data-aos="fade-up">
-          <div class="max-w-4xl mx-auto prose">
-            <h2 class="text-3xl font-bold mb-6">Habilidades</h2>
-            <h3>Habilidades Técnicas</h3>
-            <ul>
-              <li>Python</li>
-              <li>SQL</li>
-              <li>Spark</li>
-              <li>AWS</li>
-              <li>MongoDB</li>
-              <li>Power BI / Tableau</li>
-            </ul>
-            <h3>Otros</h3>
-            <ul>
-              <li>Metodologías ágiles (Scrum)</li>
-              <li>CI/CD (GitHub Actions)</li>
-            </ul>
-          </div>
-        </section>
-
-        <!-- Contact Section (sin flechas) -->
-        <section id="contact" class="h-screen px-6 bg-lightgray flex items-center justify-center text-center" data-aos="fade-up">
-          <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl font-bold mb-6">Contacto</h2>
-            <p>Email: <a href="mailto:antonio.rn98@gmail.com" class="text-primary">antonio.rn98@gmail.com</a></p>
-            <p>Teléfono: +34 722 23 67 62</p>
-            <p>LinkedIn: <a href="https://www.linkedin.com/in/antonio-jose-rodriguez-nevado" target="_blank" class="text-primary">antonio-jose-rodriguez-nevado</a></p>
-          </div>
-        </section>
-      </div>
-    </main>
-
-    <!-- Footer fijo -->
-    <footer class="fixed bottom-0 left-0 w-full h-16 bg-[#1D1D1F] text-white text-center flex items-center justify-center z-50">
-      <p>© 2025 Antonio José Rodríguez Nevado</p>
-    </footer>
-
-    <!-- AOS JS (animaciones) -->
-    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-    <!-- Lenis (scroll suave) -->
-    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
-    <!-- Script del scroll (centrado suave al parar de scrollear, con Lenis) -->
-    <script src="js/scroll.js"></script>
-    <script> AOS.init({scrollContainer: '#scroll-container'});</script>
-    <!-- Script para el funcionamiento del nav bar -->
-    <script src="js/nav_click.js"></script>
+  <script>
+    // Seleccionamos el contenedor de los párrafos y la sección del efecto.
+    const horizontalContainer = document.getElementById('horizontal-container');
+    const scrollSection = document.querySelector('.scroll-section');
     
-    <!-- Nuevo script para convertir scroll vertical en horizontal en la sección "Experiencia" -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const horizontalContainer = document.querySelector('.horizontal-scroll-container');
-        if (horizontalContainer) {
-          horizontalContainer.addEventListener('wheel', function(e) {
-            // Si hay desplazamiento vertical, lo redirigimos a horizontal
-            if (e.deltaY !== 0) {
-              e.preventDefault();
-              horizontalContainer.scrollLeft += e.deltaY;
-            }
-          });
-        }
-      });
-    </script>
-  </body>
+    // Se obtiene la posición superior y altura de la sección.
+    const sectionTop = scrollSection.offsetTop;
+    const sectionHeight = scrollSection.offsetHeight;
+    
+    // Escuchamos el evento de scroll para actualizar el desplazamiento horizontal.
+    window.addEventListener('scroll', () => {
+      const scrollY = window.pageYOffset;
+      
+      // Solo actuamos cuando estamos en la sección deseada
+      if (scrollY >= sectionTop && scrollY <= sectionTop + sectionHeight) {
+        // Calculamos el progreso (valor entre 0 y 1)
+        const progress = (scrollY - sectionTop) / sectionHeight;
+        // Definimos la traslación horizontal deseada, por ejemplo de 0 a -500 píxeles.
+        const translateX = -500 * progress;
+        // Actualizamos el estilo transform del contenedor.
+        horizontalContainer.style.transform = `translateX(${translateX}px)`;
+      }
+    });
+  </script>
+</body>
 </html>
