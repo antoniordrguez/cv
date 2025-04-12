@@ -2,15 +2,15 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Efecto Scroll Horizontal Fijo (Ajustado)</title>
+  <title>Efecto Scroll Horizontal con Gap al Inicio y Final</title>
   <style>
-    /* Reset básico */
+    /* Reset y estilos básicos */
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
     }
-    /* Espaciadores para ver contenido antes y después */
+    /* Contenido para ver antes y después */
     .spacer {
       height: 100vh;
       display: flex;
@@ -18,14 +18,13 @@
       align-items: center;
       background: #f0f0f0;
     }
-    /* Sección con altura extendida para permitir el scroll vertical */
+    /* Sección de scroll: la altura debe ser proporcional al ancho total del contenido */
     .scroll-section {
       position: relative;
-      /* La altura debe ser proporcional al ancho total del contenido horizontal.
-           En este ejemplo, con 4 párrafos de 100vw, usamos 400vh. */
+      /* Con 4 párrafos de 100vw cada uno, 400vh es suficiente */
       height: 400vh;
     }
-    /* Contenedor sticky que se queda fijo durante el scroll dentro de la sección */
+    /* Contenedor sticky que permanece fijo durante el scroll en la sección */
     .sticky-container {
       position: sticky;
       top: 0;
@@ -38,7 +37,7 @@
       height: 100%;
       transition: transform 0.1s ease-out;
     }
-    /* Cada párrafo ocupa el ancho completo de la ventana */
+    /* Cada párrafo ocupa el 100vw y está separado visualmente */
     .horizontal-container p {
       min-width: 100vw;
       margin: 0;
@@ -76,20 +75,40 @@
     const horizontalContainer = document.getElementById('horizontal-container');
     const scrollSection = document.querySelector('.scroll-section');
 
-    // Calculamos el máximo desplazamiento horizontal (la diferencia entre el ancho total del contenido y el viewport)
+    // Calcula el máximo desplazamiento horizontal: diferencia entre el ancho total del contenido y el ancho del viewport
     const totalWidth = horizontalContainer.scrollWidth;
     const maxTranslate = totalWidth - window.innerWidth;
+
+    // Definición de los gaps
+    // gapStart: progreso mínimo (porcentaje) de scroll dentro de la sección para iniciar la traslación
+    // gapEnd: porcentaje en que se completa la traslación
+    const gapStart = 0.20; // 20%
+    const gapEnd = 0.80;   // 80%
 
     window.addEventListener('scroll', () => {
       const sectionRect = scrollSection.getBoundingClientRect();
       let progress = 0;
       
-      // Solo iniciamos el desplazamiento cuando la parte superior de la sección ya ha llegado a (o sobre) la parte superior del viewport.
+      // Se calcula el progreso sólo cuando la sección ya está fijada (arriba del viewport)
       if (sectionRect.top <= 0) {
-        progress = Math.min((Math.abs(sectionRect.top)) / (scrollSection.offsetHeight - window.innerHeight), 1);
+        progress = Math.min(Math.abs(sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 1);
       }
       
-      horizontalContainer.style.transform = `translateX(-${progress * maxTranslate}px)`;
+      // Se aplica el gap:
+      // - Hasta el 20% de progreso, no se desplaza horizontalmente.
+      // - Entre 20% y 80% se incrementa linealmente.
+      // - Por encima del 80% se mantiene en 1, dejando el gap final.
+      let effectiveProgress = 0;
+      if (progress < gapStart) {
+        effectiveProgress = 0;
+      } else if (progress > gapEnd) {
+        effectiveProgress = 1;
+      } else {
+        effectiveProgress = (progress - gapStart) / (gapEnd - gapStart);
+      }
+      
+      // Se aplica la transformación horizontal
+      horizontalContainer.style.transform = `translateX(-${effectiveProgress * maxTranslate}px)`;
     });
   </script>
 </body>
