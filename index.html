@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Título Fijo + Bloques Horizontales con Fade</title>
+  <title>Bloque Centrado con Fade Lateral y Gaps en Scroll</title>
   <style>
-    /* Reset y estilos básicos */
+    /* RESET BÁSICO Y CONFIGURACIÓN GENERAL */
     * {
       box-sizing: border-box;
     }
@@ -12,27 +12,29 @@
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
+      background-color: #fff;
     }
     .spacer {
-      height: 100vh; /* Para simular contenido antes y después */
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       background: #f0f0f0;
     }
-    /* Sección principal con altura extendida para generar scroll vertical */
+
+    /* SECCIÓN DE SCROLL */
     .scroll-section {
       position: relative;
-      height: 400vh; /* Ajusta este valor según cuántos bloques tengas */
+      height: 400vh; /* Espacio vertical para trabajar el efecto */
     }
-    /* Contenedor sticky: se queda fijo en el viewport a medida que hacemos scroll */
+    /* Contenedor sticky que se queda fijo en el viewport */
     .sticky-container {
       position: sticky;
       top: 0;
       height: 100vh;
-      overflow: hidden;
+      overflow: visible;
     }
-    /* Título de la sección, fijo en la parte superior sin verse afectado por la máscara */
+    /* Título fijo (no se mueve horizontalmente) */
     .section-title {
       position: absolute;
       top: 20px;
@@ -41,43 +43,56 @@
       font-size: 2rem;
       margin: 0;
       padding: 10px 20px;
-      z-index: 10; /* Para que quede por encima de los bloques */
-      background: white; /* Opcional, por si quieres un fondo */
+      z-index: 10;
+      background: white;
     }
-    /* Contenedor que aplica la máscara (difuminado) solo en los laterales de los bloques */
-    .blocks-mask {
+
+    /* Wrapper para los bloques: delimita la “ventana” central */
+    .blocks-wrapper {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 80%;         /* Ajusta el tamaño deseado para los bloques */
-      height: 60vh;       /* Ajusta la altura deseada para los bloques */
-      -webkit-mask-image: linear-gradient(to right, transparent 15%, black 50%, transparent 85%);
-      mask-image: linear-gradient(to right, transparent 15%, black 50%, transparent 85%);
-      -webkit-mask-size: 100% 100%;
-      mask-size: 100% 100%;
-      -webkit-mask-repeat: no-repeat;
-      mask-repeat: no-repeat;
-      overflow: hidden;   /* Evita que aparezca scroll interno */
+      width: 60vw;     /* El ancho de la "ventana" donde el bloque aparece nítido */
+      height: 60vh;    /* Altura fija para el bloque */
+      overflow: hidden; /* Oculta lo que se sale del área */
     }
-    /* Contenedor horizontal que se desplaza según el scroll vertical */
+
+    /* Contenedor horizontal que se moverá con scroll vertical */
     .horizontal-container {
       display: flex;
       height: 100%;
-      transition: transform 0.1s ease-out; /* Suaviza el movimiento */
+      transition: transform 0.1s ease-out;
     }
-    /* Cada bloque ocupa la totalidad del ancho de .blocks-mask (en este caso 80% de la pantalla) */
+    /* Cada bloque ocupa el 100% del ancho del wrapper */
     .block {
-      min-width: 80%;
-      height: 100%;
       flex-shrink: 0;
+      width: 100%;
+      height: 100%;
       background: #ddd;
-      margin: 0;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       font-size: 1.5rem;
       border-right: 1px solid #fff;
+    }
+
+    /* Overlays de fade (difuminado) en los laterales del wrapper */
+    .fade-overlay {
+      position: absolute;
+      top: 0;
+      width: 15%; /* Ajusta este porcentaje según el efecto deseado */
+      height: 100%;
+      pointer-events: none; /* No interfiere con el scroll */
+      z-index: 5;
+    }
+    .fade-overlay.left {
+      left: 0;
+      background: linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0));
+    }
+    .fade-overlay.right {
+      right: 0;
+      background: linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0));
     }
   </style>
 </head>
@@ -87,21 +102,25 @@
     <h1>Contenido Superior</h1>
   </div>
 
-  <!-- Sección con el efecto de bloque horizontal difuminado -->
+  <!-- Sección con el título fijo y bloques móviles -->
   <section class="scroll-section">
     <div class="sticky-container">
 
-      <!-- Título fijo que NO se desplaza horizontalmente -->
+      <!-- Título fijo -->
       <h1 class="section-title">TÍTULO DE LA SECCIÓN</h1>
 
-      <!-- Contenedor que aplica la máscara (fade) solo a los bloques -->
-      <div class="blocks-mask">
+      <!-- Wrapper central que define la "ventana" del bloque activo -->
+      <div class="blocks-wrapper">
+        <!-- Contenedor que se moverá horizontalmente -->
         <div class="horizontal-container" id="horizontal-container">
-          <div class="block">Bloque de Texto 1</div>
-          <div class="block">Bloque de Texto 2</div>
-          <div class="block">Bloque de Texto 3</div>
-          <div class="block">Bloque de Texto 4</div>
+          <div class="block">Bloque 1: Texto de ejemplo</div>
+          <div class="block">Bloque 2: Texto de ejemplo</div>
+          <div class="block">Bloque 3: Texto de ejemplo</div>
+          <div class="block">Bloque 4: Texto de ejemplo</div>
         </div>
+        <!-- Overlays para crear efecto de difuminado en los laterales -->
+        <div class="fade-overlay left"></div>
+        <div class="fade-overlay right"></div>
       </div>
 
     </div>
@@ -112,40 +131,29 @@
   </div>
 
   <script>
-    // --- CONFIGURACIÓN DE SCROLL Y GAPS ---
+    /* CONFIGURACIÓN Y CÁLCULO DE SCROLL */
     const scrollSection = document.querySelector('.scroll-section');
     const horizontalContainer = document.getElementById('horizontal-container');
-
-    // Número de bloques
     const numBlocks = horizontalContainer.children.length;
 
-    // Ancho total: cada bloque mide "80%" del viewport, pero en píxeles
-    const blocksMask = document.querySelector('.blocks-mask');
-    const blockWidth = blocksMask.offsetWidth; // ancho real en píxeles
-    const totalWidth = blockWidth * numBlocks;
-    const maxTranslate = totalWidth - blockWidth;
+    // Se medirá el ancho del wrapper (la "ventana" centrada) para calcular el desplazamiento
+    const blocksWrapper = document.querySelector('.blocks-wrapper');
+    
+    // GAP GENERAL en el scroll vertical (para que no inicie ni finalice inmediatamente)
+    const overallGapStart = 0.20; // 20%
+    const overallGapEnd   = 0.80; // 80%
 
-    // GAP general antes de iniciar la transición y al finalizar
-    const overallGapStart = 0.10; // 20%
-    const overallGapEnd   = 0.90; // 80%
-
-    // GAP local entre bloques
-    const localGapStart = 0.30; // 30% del segmento
-    const localGapEnd   = 0.70; // 70% del segmento
+    // GAP LOCAL: cada transición entre bloques tendrá una "zona muerta"
+    const localGapStart = 0.3; // 30% del segmento
+    const localGapEnd   = 0.7; // 70% del segmento
 
     window.addEventListener('scroll', () => {
       const sectionRect = scrollSection.getBoundingClientRect();
       let progress = 0;
-
-      // Progreso de 0 a 1 según la posición de la sección (cuando top <= 0)
       if (sectionRect.top <= 0) {
-        progress = Math.min(
-          Math.abs(sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight),
-          1
-        );
+        progress = Math.min(Math.abs(sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 1);
       }
-
-      // 1) GAP GENERAL
+      // 1) GAP GENERAL: controla cuándo inicia y termina el movimiento horizontal global
       let overallProgress = 0;
       if (progress < overallGapStart) {
         overallProgress = 0;
@@ -154,21 +162,13 @@
       } else {
         overallProgress = (progress - overallGapStart) / (overallGapEnd - overallGapStart);
       }
-
-      // 2) DIVIDIR EN SEGMENTOS PARA CADA BLOQUE
+      // 2) Dividir en segmentos correspondientes a cada transición entre bloques
       const numTransitions = numBlocks - 1;
       const segmentLength = 1 / numTransitions;
       let segmentIndex = Math.floor(overallProgress / segmentLength);
-
-      // Ajuste si overallProgress llega a 1
-      if (segmentIndex >= numTransitions) {
-        segmentIndex = numTransitions - 1;
-      }
-
-      // Progreso local dentro del segmento
-      const localProgress = (overallProgress - segmentIndex * segmentLength) / segmentLength;
-
-      // 3) GAP POR BLOQUE
+      if (segmentIndex >= numTransitions) segmentIndex = numTransitions - 1;
+      let localProgress = (overallProgress - segmentIndex * segmentLength) / segmentLength;
+      // 3) GAP LOCAL: dentro de cada segmento se define una zona en la que el bloque se mantiene fijo
       let interp = 0;
       if (localProgress < localGapStart) {
         interp = 0;
@@ -177,11 +177,9 @@
       } else {
         interp = (localProgress - localGapStart) / (localGapEnd - localGapStart);
       }
-
-      // Índice continuo del bloque actual
       const effectiveIndex = segmentIndex + interp;
-
-      // Se traduce el índice al desplazamiento horizontal en píxeles
+      // 4) Calcular el desplazamiento horizontal: cada bloque ocupa el ancho del wrapper
+      const blockWidth = blocksWrapper.offsetWidth;
       const translateX = effectiveIndex * blockWidth;
       horizontalContainer.style.transform = `translateX(-${translateX}px)`;
     });
