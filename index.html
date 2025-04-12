@@ -99,8 +99,8 @@
     // --- GAP POR BLOQUES ---
     // Cada transición entre un párrafo y el siguiente tendrá un "dead zone"
     // de modo que, dentro de cada segmento, durante cierto porcentaje el bloque se mantiene fijo.
-    const localGapStart = 0.15; // porcentaje inicial de cada segmento sin movimiento
-    const localGapEnd   = 0.85 // porcentaje final donde se completa la transición
+    const localGapStart = 0.30; // porcentaje inicial de cada segmento sin movimiento
+    const localGapEnd   = 0.70 // porcentaje final donde se completa la transición
 
     window.addEventListener('scroll', () => {
       const sectionRect = scrollSection.getBoundingClientRect();
