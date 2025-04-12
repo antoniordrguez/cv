@@ -2,84 +2,96 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Efecto de scroll horizontal con párrafos</title>
+  <title>Efecto Scroll Horizontal Fijo</title>
   <style>
+    /* Reset básico */
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      /* Se extiende el scroll para poder apreciar el efecto */
-      height: 200vh;
     }
-    /* Sección que contiene el efecto */
+    /* Espaciadores para ver contenido antes y después */
+    .spacer {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f0f0f0;
+    }
+    /* Sección con altura extendida para permitir el scroll vertical */
     .scroll-section {
       position: relative;
-      height: 100vh;
-      overflow: hidden;
+      /* La altura debe cubrir el ancho total del contenido horizontal.
+           En este ejemplo, 4 párrafos ocupando 100vw cada uno = 400vw, 
+           así que usamos 400vh, pero lo puedes ajustar según lo necesites. */
+      height: 400vh;
     }
-    /* Contenedor horizontal que se mantendrá fijo (sticky) durante el scroll */
-    .horizontal-container {
+    /* Contenedor fijo dentro de la sección para contener el contenido horizontal */
+    .sticky-container {
       position: sticky;
       top: 0;
       height: 100vh;
+      overflow: hidden;
+    }
+    /* Contenedor horizontal que se desplazará con transform */
+    .horizontal-container {
       display: flex;
-      align-items: center;
-      /* Para que el contenido se muestre en una línea horizontal */
-      white-space: nowrap;
-      will-change: transform;
+      height: 100%;
       transition: transform 0.1s ease-out;
     }
-    /* Estilos para cada párrafo */
+    /* Cada párrafo ocupa el ancho completo de la ventana */
     .horizontal-container p {
-      font-size: 1.8em;
-      margin: 0 2em;
-      display: inline-block;
+      min-width: 100vw;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+      font-size: 1.5em;
+      text-align: center;
+      background: #ddd;
+      border-right: 1px solid #fff;
     }
   </style>
 </head>
 <body>
-  <!-- Contenido antes de la sección para notar el scroll -->
-  <div style="height: 50vh; display: flex; justify-content: center; align-items: center;">
-    <h1>Contenido Inicial</h1>
+  <div class="spacer">
+    <h1>Contenido Superior</h1>
   </div>
 
-  <!-- Sección del efecto -->
+  <!-- Sección del efecto de scroll horizontal -->
   <section class="scroll-section">
-    <div class="horizontal-container" id="horizontal-container">
-      <p>Párrafo 1: Este es el primer párrafo que se desplaza horizontalmente.</p>
-      <p>Párrafo 2: Otro párrafo para demostrar el efecto.</p>
-      <p>Párrafo 3: Continúa el desplazamiento con contenido interesante.</p>
-      <p>Párrafo 4: Concluye el efecto con este texto final.</p>
+    <div class="sticky-container">
+      <div class="horizontal-container" id="horizontal-container">
+        <p>Párrafo 1: Primer texto.</p>
+        <p>Párrafo 2: Segundo texto.</p>
+        <p>Párrafo 3: Tercer texto.</p>
+        <p>Párrafo 4: Cuarto texto.</p>
+      </div>
     </div>
   </section>
 
-  <!-- Contenido posterior para completar el scroll -->
-  <div style="height: 150vh; display: flex; justify-content: center; align-items: center;">
-    <h1>Contenido Final</h1>
+  <div class="spacer">
+    <h1>Contenido Inferior</h1>
   </div>
 
   <script>
-    // Seleccionamos el contenedor de los párrafos y la sección del efecto.
     const horizontalContainer = document.getElementById('horizontal-container');
     const scrollSection = document.querySelector('.scroll-section');
-    
-    // Se obtiene la posición superior y altura de la sección.
-    const sectionTop = scrollSection.offsetTop;
-    const sectionHeight = scrollSection.offsetHeight;
-    
-    // Escuchamos el evento de scroll para actualizar el desplazamiento horizontal.
+
     window.addEventListener('scroll', () => {
-      const scrollY = window.pageYOffset;
+      // Obtenemos la distancia desde el top de la ventana hasta la sección
+      const sectionRect = scrollSection.getBoundingClientRect();
+      // Para calcular el progreso, usamos la altura de la ventana.
+      // Cuando la parte superior de la sección toca la parte superior de la ventana,
+      // sectionRect.top es 0; al final, será - (sección alta - window.innerHeight).
+      const progress = Math.min(Math.max((window.innerHeight - sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 0), 1);
       
-      // Solo actuamos cuando estamos en la sección deseada
-      if (scrollY >= sectionTop && scrollY <= sectionTop + sectionHeight) {
-        // Calculamos el progreso (valor entre 0 y 1)
-        const progress = (scrollY - sectionTop) / sectionHeight;
-        // Definimos la traslación horizontal deseada, por ejemplo de 0 a -500 píxeles.
-        const translateX = -500 * progress;
-        // Actualizamos el estilo transform del contenedor.
-        horizontalContainer.style.transform = `translateX(${translateX}px)`;
-      }
+      // Calculamos el máximo desplazamiento horizontal:
+      // totalWidth es el ancho total del contenido horizontal.
+      const totalWidth = horizontalContainer.scrollWidth;
+      const maxTranslate = totalWidth - window.innerWidth;
+
+      // Aplicamos la transformación horizontal basada en el progreso.
+      horizontalContainer.style.transform = `translateX(-${progress * maxTranslate}px)`;
     });
   </script>
 </body>
