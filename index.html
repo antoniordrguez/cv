@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Bloque Centrado con Borde Fijo, Fade Lateral y Gaps en Scroll</title>
+  <title>Bloque Centrado con Overlays de Borde, Fade y Gaps</title>
   <style>
     /* RESET BÁSICO Y CONFIGURACIÓN GENERAL */
     * {
@@ -33,7 +33,7 @@
       height: 100vh;
       overflow: visible;
     }
-    /* Título fijo (no se mueve horizontalmente) */
+    /* Título fijo (no se desplaza horizontalmente) */
     .section-title {
       position: absolute;
       top: 20px;
@@ -42,7 +42,7 @@
       font-size: 2rem;
       margin: 0;
       padding: 10px 20px;
-      z-index: 10;
+      z-index: 50;
       background: white;
     }
     /* Wrapper central (ventana) que define el área donde se muestra el bloque activo */
@@ -51,11 +51,12 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 60vw;     /* Ancho del área central */
-      height: 60vh;    /* Alto del área central */
+      width: 60vw;  /* Ancho del área central */
+      height: 60vh; /* Alto del área central */
       overflow: hidden;
+      z-index: 10; /* Debe estar por debajo de los elementos fijos de borde */
     }
-    /* Contenedor horizontal que se desplazará con el scroll vertical */
+    /* Contenedor horizontal que se desplazará con scroll vertical */
     .horizontal-container {
       display: flex;
       height: 100%;
@@ -73,11 +74,13 @@
       font-size: 1.5rem;
       border-right: 1px solid #fff;
     }
-    /* Overlays de fade (difuminado) en los laterales del wrapper */
+    /* Overlays de fade (difuminado) en los laterales del wrapper.
+       Estos overlays se aplican dentro del wrapper, de modo que sólo el área
+       central se vea nítida y las partes exteriores se desvanecen */
     .fade-overlay {
       position: absolute;
       top: 0;
-      width: 15%; /* Ajusta este porcentaje según el efecto deseado */
+      width: 15%;
       height: 100%;
       pointer-events: none;
       z-index: 5;
@@ -90,34 +93,34 @@
       right: 0;
       background: linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0));
     }
-    /* BORDES FIJOS para separar el bloque central de las áreas difuminadas */
-    .fixed-border {
+    /* Overlays para simular bordes fijos.
+       Están posicionados en la parte externa del wrapper, sobre el sticky-container. */
+    .fixed-border-overlay {
       position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 5px; /* Grosor del borde (ajusta según prefieras) */
-      height: 60vh; /* Igual al alto del wrapper */
-      background-color: #fff; /* Color del borde */
-      z-index: 12;
+      top: calc(50% - 30vh); /* Centrado verticalmente respecto al wrapper de 60vh de alto */
+      width: 5px;          /* Grosor del borde */
+      height: 60vh;        /* Igual al alto del wrapper */
+      background: #fff;     /* Color del borde (puedes ajustar) */
+      z-index: 100;
+      pointer-events: none;
     }
-    .fixed-border.left {
-      left: calc(50% - 30vw); /* 30vw = la mitad de 60vw, es decir, la izquierda del wrapper */
+    .fixed-border-overlay.left {
+      left: calc(50% - 30vw); /* 60vw es el ancho del wrapper, mitad es 30vw; este es el borde izquierdo */
     }
-    .fixed-border.right {
-      right: calc(50% - 30vw);
+    .fixed-border-overlay.right {
+      right: calc(50% - 30vw); /* Borde derecho */
     }
   </style>
 </head>
 <body>
-
   <div class="spacer">
     <h1>Contenido Superior</h1>
   </div>
 
-  <!-- Sección con título fijo, bloques móviles y bordes fijos -->
+  <!-- Sección con título fijo, bloques móviles, fade lateral y borde fijo -->
   <section class="scroll-section">
     <div class="sticky-container">
-      <!-- Título fijo que permanece en la parte superior -->
+      <!-- Título fijo -->
       <h1 class="section-title">TÍTULO DE LA SECCIÓN</h1>
 
       <!-- Wrapper central que delimita la ventana de visualización del bloque activo -->
@@ -129,14 +132,14 @@
           <div class="block">Bloque 3: Texto de ejemplo</div>
           <div class="block">Bloque 4: Texto de ejemplo</div>
         </div>
-        <!-- Overlays para el efecto de difuminado en los laterales -->
+        <!-- Overlays de difuminado en los laterales dentro del wrapper -->
         <div class="fade-overlay left"></div>
         <div class="fade-overlay right"></div>
       </div>
 
-      <!-- Bordes fijos a ambos lados de la ventana central -->
-      <div class="fixed-border left"></div>
-      <div class="fixed-border right"></div>
+      <!-- Overlays para simular bordes fijos, posicionados sobre la ventana central -->
+      <div class="fixed-border-overlay left"></div>
+      <div class="fixed-border-overlay right"></div>
     </div>
   </section>
 
@@ -145,17 +148,17 @@
   </div>
 
   <script>
-    /* CONFIGURACIÓN Y CÁLCULO DEL SCROLL */
+    /* CONFIGURACIÓN DEL SCROLL Y LOS GAPS */
     const scrollSection = document.querySelector('.scroll-section');
     const horizontalContainer = document.getElementById('horizontal-container');
     const numBlocks = horizontalContainer.children.length;
     const blocksWrapper = document.querySelector('.blocks-wrapper');
 
-    // GAP GENERAL en el scroll vertical: evita que el movimiento horizontal inicie o finalice inmediatamente
-    const overallGapStart = 0.10; // 20%
-    const overallGapEnd   = 0.90; // 80%
+    // GAP GENERAL en el scroll vertical: evita que el movimiento horizontal inicie o finalice inmediatamente.
+    const overallGapStart = 0.05; // 20%
+    const overallGapEnd   = 0.95; // 80%
 
-    // GAP LOCAL: cada transición entre bloques tendrá una zona "muerta"
+    // GAP LOCAL: en cada segmento (entre bloques) se define una zona sin movimiento.
     const localGapStart = 0.3; // 30% del segmento
     const localGapEnd   = 0.7; // 70% del segmento
 
@@ -166,7 +169,7 @@
         progress = Math.min(Math.abs(sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 1);
       }
 
-      // 1) Aplicar GAP GENERAL para que el desplazamiento horizontal no inicie ni finalice de inmediato
+      // 1) GAP GENERAL: determina cuándo inicia y termina el movimiento horizontal global
       let overallProgress = 0;
       if (progress < overallGapStart) {
         overallProgress = 0;
@@ -176,14 +179,14 @@
         overallProgress = (progress - overallGapStart) / (overallGapEnd - overallGapStart);
       }
 
-      // 2) Dividir el progreso en segmentos para cada transición entre bloques
+      // 2) Dividir overallProgress en segmentos para cada transición entre bloques
       const numTransitions = numBlocks - 1;
       const segmentLength = 1 / numTransitions;
       let segmentIndex = Math.floor(overallProgress / segmentLength);
       if (segmentIndex >= numTransitions) segmentIndex = numTransitions - 1;
       let localProgress = (overallProgress - segmentIndex * segmentLength) / segmentLength;
 
-      // 3) Aplicar GAP LOCAL: en cada segmento, se define una zona sin movimiento
+      // 3) GAP LOCAL: dentro de cada segmento se define una zona sin movimiento
       let interp = 0;
       if (localProgress < localGapStart) {
         interp = 0;
