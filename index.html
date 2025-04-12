@@ -2,19 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Desplazamiento Horizontal con Mask y Gap en Scroll</title>
+  <title>Desplazamiento Horizontal con Gap General y por Bloques</title>
   <style>
     /* Reset y estilos básicos */
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
       background-color: #fff;
     }
-    /* Espaciadores para simular contenido antes y después */
+    /* Espaciadores para simular contenido adicional */
     .spacer {
       height: 100vh;
       display: flex;
@@ -22,12 +20,12 @@
       align-items: center;
       background: #f0f0f0;
     }
-    /* Sección extendida para generar el espacio de scroll vertical */
+    /* Sección con altura extendida para generar el espacio de scroll vertical */
     .scroll-section {
       position: relative;
-      height: 400vh; /* Ajusta este valor según la cantidad de bloques */
+      height: 400vh; /* Ajusta este valor según tus necesidades */
     }
-    /* Contenedor sticky que permanece fijo durante el scroll en la sección */
+    /* Contenedor sticky que se mantiene fijo durante el scroll */
     .sticky-container {
       position: sticky;
       top: 0;
@@ -65,7 +63,7 @@
     <h1>Contenido Superior</h1>
   </div>
 
-  <!-- Sección del efecto con desplazamiento horizontal -->
+  <!-- Sección con desplazamiento horizontal controlado por scroll vertical -->
   <section class="scroll-section">
     <div class="sticky-container">
       <div class="horizontal-container" id="horizontal-container">
@@ -85,39 +83,68 @@
     // Seleccionamos el contenedor horizontal y la sección de scroll
     const horizontalContainer = document.getElementById('horizontal-container');
     const scrollSection = document.querySelector('.scroll-section');
+    const numBlocks = horizontalContainer.children.length; // número total de párrafos
 
-    // Calculamos el máximo desplazamiento horizontal: 
-    // diferencia entre el ancho total del contenido y el ancho del viewport.
+    // Para bloques de 100vw cada uno, se espera que:
+    // totalWidth = numBlocks * window.innerWidth
+    // y el máximo desplazamiento horizontal es:
     const totalWidth = horizontalContainer.scrollWidth;
-    const maxTranslate = totalWidth - window.innerWidth;
+    const maxTranslate = totalWidth - window.innerWidth; // (numBlocks - 1) * window.innerWidth
 
-    // Definimos los umbrales del "gap" en el scroll:
-    // gapStart: porcentaje de scroll para no iniciar el desplazamiento horizontal
-    // gapEnd: porcentaje de scroll a partir del cual se completa el efecto.
-    const gapStart = 0.20; // 20%
-    const gapEnd   = 0.80; // 80%
+    // --- GAP GENERAL en el scroll vertical ---
+    // Antes de que inicie el desplazamiento horizontal y después de completarlo.
+    const overallGapStart = 0.15; // 20% del scroll vertical para iniciar
+    const overallGapEnd   = 0.85; // 80% para completar el desplazamiento
+
+    // --- GAP POR BLOQUES ---
+    // Cada transición entre un párrafo y el siguiente tendrá un "dead zone"
+    // de modo que, dentro de cada segmento, durante cierto porcentaje el bloque se mantiene fijo.
+    const localGapStart = 0.15; // porcentaje inicial de cada segmento sin movimiento
+    const localGapEnd   = 0.85 // porcentaje final donde se completa la transición
 
     window.addEventListener('scroll', () => {
       const sectionRect = scrollSection.getBoundingClientRect();
       let progress = 0;
-      
-      // Calculamos el progreso solo cuando la sección se ha fijado (o supera el tope del viewport)
+      // Se calcula el progreso cuando la sección ha pasado o tocado el tope del viewport.
       if (sectionRect.top <= 0) {
         progress = Math.min(Math.abs(sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 1);
       }
-      
-      // Se aplica el gap: sin desplazamiento antes del 20% y sin cambios tras el 80%
-      let effectiveProgress = 0;
-      if (progress < gapStart) {
-        effectiveProgress = 0;
-      } else if (progress > gapEnd) {
-        effectiveProgress = 1;
+
+      // Aplicamos el GAP GENERAL:
+      let overallProgress = 0;
+      if (progress < overallGapStart) {
+        overallProgress = 0;
+      } else if (progress > overallGapEnd) {
+        overallProgress = 1;
       } else {
-        effectiveProgress = (progress - gapStart) / (gapEnd - gapStart);
+        overallProgress = (progress - overallGapStart) / (overallGapEnd - overallGapStart);
       }
-      
-      // Se actualiza el transform para desplazar horizontalmente el contenedor
-      horizontalContainer.style.transform = `translateX(-${effectiveProgress * maxTranslate}px)`;
+
+      // Mapeamos overallProgress (de 0 a 1) a los bloque (de 0 a numBlocks - 1)
+      const numTransitions = numBlocks - 1;
+      const segmentLength = 1 / numTransitions;
+      let segmentIndex = Math.floor(overallProgress / segmentLength);
+      if (segmentIndex >= numTransitions) {
+        segmentIndex = numTransitions - 1;
+      }
+      // Progreso dentro del segmento actual (de 0 a 1)
+      let localProgress = (overallProgress - segmentIndex * segmentLength) / segmentLength;
+
+      // Aplicamos el GAP POR BLOQUES:
+      let interp = 0;
+      if (localProgress < localGapStart) {
+        interp = 0;
+      } else if (localProgress > localGapEnd) {
+        interp = 1;
+      } else {
+        interp = (localProgress - localGapStart) / (localGapEnd - localGapStart);
+      }
+
+      // El índice efectivo (continúa) para la posición horizontal es:
+      const effectiveIndex = segmentIndex + interp;
+      // Convertimos el índice en desplazamiento horizontal
+      const translateX = effectiveIndex * window.innerWidth;
+      horizontalContainer.style.transform = `translateX(-${translateX}px)`;
     });
   </script>
 </body>
