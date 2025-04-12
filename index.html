@@ -26,12 +26,14 @@
     <!-- CSS de botones, estilos, tipografías, highlight (si lo usas) -->
     <link rel="stylesheet" href="css/button.css">
     <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/arrows.css" />
+    <!-- Se puede desactivar arrows.css si solo lo usaba para las flechas -->
+    <!-- <link rel="stylesheet" href="css/arrows.css" /> -->
     <link rel="stylesheet" href="css/typography.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github-dark.css" />
 
+    <!-- Estilos personalizados para el scroll horizontal en "Experiencia" -->
     <style>
-      /* Comentamos scroll-behavior para evitar conflictos con Lenis */
+      /* Evitamos conflictos con scroll-behavior si se usa Lenis */
       /*
       html {
         scroll-behavior: smooth;
@@ -43,8 +45,22 @@
         padding: 0;
         box-sizing: border-box;
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-        /* Para que no haya scroll duplicado */
+        /* Para evitar scroll duplicado */
         overflow: hidden;
+      }
+
+      /* Estilos para la sección de experiencia con scroll horizontal */
+      .horizontal-scroll-container {
+        display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch; /* Suavidad en móviles */
+      }
+      .experience-block {
+        flex: 0 0 100%;
+        scroll-snap-align: start;
+        padding: 1rem;
       }
     </style>
   </head>
@@ -68,7 +84,7 @@
     <!-- Contenedor principal con overflow para scroll manual -->
     <main id="scroll-container" class="absolute top-16 left-0 right-0 bottom-16 overflow-y-scroll">
       <div>
-        <!-- Hero Section (solo flecha hacia abajo) -->
+        <!-- Hero Section (sin flechas) -->
         <section id="hero" class="h-screen px-6 bg-white flex items-center justify-center" data-aos="fade-right">
           <div class="max-w-6xl w-full flex flex-col md:flex-row items-center md:items-start">
             <!-- Columna de texto -->
@@ -86,14 +102,9 @@
               <img src="assets/images/me.png" alt="Foto de Antonio" class="rounded-full h-64 w-64 object-cover shadow-lg float-anim">
             </div>
           </div>
-          <!-- Flecha hacia abajo -->
-          <div class="arrow arrow-down" data-direction="down">
-            <div class="arrow-bar-left"></div>
-            <div class="arrow-bar-right"></div>
-          </div>
         </section>
 
-        <!-- About Section -->
+        <!-- About Section (sin flechas) -->
         <section id="about" class="h-screen px-6 bg-lightgray flex items-center justify-center" data-aos="fade-up">
           <div class="max-w-4xl mx-auto prose">
             <h2 class="text-3xl font-bold mb-6">Acerca de mí</h2>
@@ -107,51 +118,37 @@
               <li>Foco en resultados</li>
             </ul>
           </div>
-          <!-- Flecha hacia arriba -->
-          <div class="arrow arrow-up" data-direction="up">
-            <div class="arrow-bar-left"></div>
-            <div class="arrow-bar-right"></div>
-          </div>
-          <!-- Flecha hacia abajo -->
-          <div class="arrow arrow-down" data-direction="down">
-            <div class="arrow-bar-left"></div>
-            <div class="arrow-bar-right"></div>
-          </div>
         </section>
 
-        <!-- Experience Section -->
+        <!-- Experience Section con scroll horizontal -->
         <section id="experience" class="h-screen px-6 bg-white flex items-center justify-center" data-aos="fade-up">
-          <div class="max-w-5xl mx-auto prose">
-            <h2 class="text-3xl font-bold mb-6">Experiencia</h2>
-            <h3>Data Analyst | Endesa X</h3>
-            <p><strong>Años:</strong> 2022 - Presente</p>
-            <ul>
-              <li>Análisis de datos, desarrollo de ETL, modelos predictivos y dashboards con Power BI/Tableau</li>
-              <li>Bases de datos SQL y NoSQL</li>
-              <li>Colaboración con equipos técnicos y de negocio</li>
-            </ul>
-            <hr />
-            <h3>Data Engineer | Otra empresa</h3>
-            <p><strong>Años:</strong> 2021 - 2022</p>
-            <ul>
-              <li>Pipelines de datos en AWS (Glue, S3, Lambda)</li>
-              <li>Optimización de consultas SQL</li>
-              <li>Procesamiento en tiempo real con Apache Kafka</li>
-            </ul>
-          </div>
-          <!-- Flecha hacia arriba -->
-          <div class="arrow arrow-up" data-direction="up">
-            <div class="arrow-bar-left"></div>
-            <div class="arrow-bar-right"></div>
-          </div>
-          <!-- Flecha hacia abajo -->
-          <div class="arrow arrow-down" data-direction="down">
-            <div class="arrow-bar-left"></div>
-            <div class="arrow-bar-right"></div>
+          <div class="horizontal-scroll-container max-w-5xl mx-auto">
+            <!-- Primer bloque de experiencia -->
+            <div class="experience-block">
+              <h2 class="text-3xl font-bold mb-6">Experiencia</h2>
+              <h3>Data Analyst | Endesa X</h3>
+              <p><strong>Años:</strong> 2022 - Presente</p>
+              <ul>
+                <li>Análisis de datos, desarrollo de ETL, modelos predictivos y dashboards con Power BI/Tableau</li>
+                <li>Bases de datos SQL y NoSQL</li>
+                <li>Colaboración con equipos técnicos y de negocio</li>
+              </ul>
+            </div>
+            <!-- Segundo bloque de experiencia -->
+            <div class="experience-block">
+              <h3>Data Engineer | Otra empresa</h3>
+              <p><strong>Años:</strong> 2021 - 2022</p>
+              <ul>
+                <li>Pipelines de datos en AWS (Glue, S3, Lambda)</li>
+                <li>Optimización de consultas SQL</li>
+                <li>Procesamiento en tiempo real con Apache Kafka</li>
+              </ul>
+            </div>
+            <!-- Puedes agregar más bloques según tus necesidades -->
           </div>
         </section>
 
-        <!-- Education Section -->
+        <!-- Education Section (sin flechas) -->
         <section id="education" class="h-screen px-6 bg-lightgray flex items-center justify-center" data-aos="fade-up">
           <div class="max-w-4xl mx-auto prose">
             <h2 class="text-3xl font-bold mb-6">Educación</h2>
@@ -162,19 +159,9 @@
               <li>Proyecto de fin de máster en Computer Vision.</li>
             </ul>
           </div>
-          <!-- Flecha hacia arriba -->
-          <div class="arrow arrow-up" data-direction="up">
-            <div class="arrow-bar-left"></div>
-            <div class="arrow-bar-right"></div>
-          </div>
-          <!-- Flecha hacia abajo -->
-          <div class="arrow arrow-down" data-direction="down">
-            <div class="arrow-bar-left"></div>
-            <div class="arrow-bar-right"></div>
-          </div>
         </section>
 
-        <!-- Skills Section -->
+        <!-- Skills Section (sin flechas) -->
         <section id="skills" class="h-screen px-6 bg-white flex items-center justify-center" data-aos="fade-up">
           <div class="max-w-4xl mx-auto prose">
             <h2 class="text-3xl font-bold mb-6">Habilidades</h2>
@@ -193,30 +180,15 @@
               <li>CI/CD (GitHub Actions)</li>
             </ul>
           </div>
-          <!-- Flecha hacia arriba -->
-          <div class="arrow arrow-up" data-direction="up">
-            <div class="arrow-bar-left"></div>
-            <div class="arrow-bar-right"></div>
-          </div>
-          <!-- Flecha hacia abajo -->
-          <div class="arrow arrow-down" data-direction="down">
-            <div class="arrow-bar-left"></div>
-            <div class="arrow-bar-right"></div>
-          </div>
         </section>
 
-        <!-- Contact Section -->
+        <!-- Contact Section (sin flechas) -->
         <section id="contact" class="h-screen px-6 bg-lightgray flex items-center justify-center text-center" data-aos="fade-up">
           <div class="max-w-4xl mx-auto">
             <h2 class="text-3xl font-bold mb-6">Contacto</h2>
             <p>Email: <a href="mailto:antonio.rn98@gmail.com" class="text-primary">antonio.rn98@gmail.com</a></p>
             <p>Teléfono: +34 722 23 67 62</p>
             <p>LinkedIn: <a href="https://www.linkedin.com/in/antonio-jose-rodriguez-nevado" target="_blank" class="text-primary">antonio-jose-rodriguez-nevado</a></p>
-          </div>
-          <!-- Solo flecha hacia arriba -->
-          <div class="arrow arrow-up" data-direction="up">
-            <div class="arrow-bar-left"></div>
-            <div class="arrow-bar-right"></div>
           </div>
         </section>
       </div>
@@ -236,7 +208,21 @@
     <script> AOS.init({scrollContainer: '#scroll-container'});</script>
     <!-- Script para el funcionamiento del nav bar -->
     <script src="js/nav_click.js"></script>
-    <!-- Script para el funcionamiento de las flechas -->
-    <script src="js/arrows.js"></script>
+    
+    <!-- Nuevo script para convertir scroll vertical en horizontal en la sección "Experiencia" -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const horizontalContainer = document.querySelector('.horizontal-scroll-container');
+        if (horizontalContainer) {
+          horizontalContainer.addEventListener('wheel', function(e) {
+            // Si hay desplazamiento vertical, lo redirigimos a horizontal
+            if (e.deltaY !== 0) {
+              e.preventDefault();
+              horizontalContainer.scrollLeft += e.deltaY;
+            }
+          });
+        }
+      });
+    </script>
   </body>
 </html>
