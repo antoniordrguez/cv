@@ -49,22 +49,27 @@
     .style {
       min-width: 100vw;
       height: 100vh;
-      background-size: cover;
-      background-position: center;
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #333;
       clip-path: inset(0 calc((1 - var(--clip-progress, 1)) * 100%) 0 0);
       transition: clip-path 0.3s ease-out;
     }
 
-    .style.default {
-      background-image: url('https://picsum.photos/1600/900');
+    .style.default::before {
+      content: "Bloque 1";
     }
 
-    .style.color {
-      background-image: url('https://picsum.photos/1600/900');
+    .style.color::before {
+      content: "Bloque 2";
     }
 
-    .style.bw {
-      background-image: url('https://picsum.photos/1600/900');
+    .style.bw::before {
+      content: "Bloque 3";
     }
 
     .overlay {
