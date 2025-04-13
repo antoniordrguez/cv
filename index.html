@@ -2,113 +2,169 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Bloque Centrado con Overlays de Borde, Fade y Gaps</title>
+  <title>Adaptación de Overlay al estilo Apple</title>
   <style>
-    /* RESET BÁSICO Y CONFIGURACIÓN GENERAL */
-    * {
-      box-sizing: border-box;
-    }
+    /* RESET Y ESTILOS BÁSICOS */
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      background-color: #fff;
+      background: #fff;
     }
     .spacer {
       height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     /* SECCIÓN DE SCROLL */
     .scroll-section {
       position: relative;
-      height: 400vh; /* Espacio vertical para trabajar el efecto */
+      height: 400vh; /* Espacio vertical para generar el efecto */
+      background: #f0f0f0;
     }
-    /* Contenedor sticky que se queda fijo en el viewport */
     .sticky-container {
       position: sticky;
       top: 0;
       height: 100vh;
       overflow: visible;
     }
-    /* Título fijo (no se desplaza horizontalmente) */
+    /* Título fijo */
     .section-title {
       position: absolute;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 2rem;
-      margin: 0;
       padding: 10px 20px;
       z-index: 50;
       background: white;
     }
-    /* Wrapper central (ventana) que define el área donde se muestra el bloque activo */
+    /* Wrapper central: ventana fija que muestra el bloque activo */
     .blocks-wrapper {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 60vw;  /* Ancho del área central */
-      height: 60vh; /* Alto del área central */
+      width: 60vw;  /* Ajusta según tu diseño */
+      height: 60vh;
       overflow: hidden;
-      z-index: 10; /* Debe estar por debajo de los elementos fijos de borde */
+      z-index: 10;
     }
-    /* Contenedor horizontal que se desplazará con scroll vertical */
-    .horizontal-container {
-      display: flex;
+    /* Moving Group: agrupa los bloques y el overlay y se mueve con el scroll */
+    .moving-group {
+      position: relative;
+      /* Su ancho es el ancho del wrapper por número de bloques.
+         Aquí tenemos 4 bloques, por lo que es 4 * 100% (del wrapper). */
+      width: calc(100% * 4);
       height: 100%;
       transition: transform 0.1s ease-out;
     }
-    /* Cada bloque ocupa el 100% del ancho del wrapper */
+    /* Contenedor horizontal de bloques */
+    .horizontal-container {
+      display: flex;
+      height: 100%;
+    }
     .block {
       flex-shrink: 0;
       width: 100%;
       height: 100%;
       background: #ddd;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       font-size: 1.5rem;
-      border-right: 1px solid #fff;
     }
-    /* Overlays de fade (difuminado) en los laterales del wrapper.
-       Estos overlays se aplican dentro del wrapper, de modo que sólo el área
-       central se vea nítida y las partes exteriores se desvanecen */
+    /* Overlay al estilo Apple: estructura copiada y adaptada */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /* Se utiliza flex para disponer los slides en columnas, como en el ejemplo */
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      z-index: 20;
+      will-change: transform;
+      /* Variables para el borde */
+      --gallery-width: 60vw;
+      --width: 10px;
+      --height: 4px;
+    }
+    .overlay .slide {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .overlay .corner,
+    .overlay .rect {
+      position: absolute;
+      background: #f0f0f0; /* Color que coincide con el fondo de la sección */
+    }
+    .overlay .corner {
+      width: var(--width);
+      height: var(--width);
+    }
+    .overlay .corner.top.left {
+      top: 0;
+      left: 0;
+    }
+    .overlay .corner.top.right {
+      top: 0;
+      right: 0;
+    }
+    .overlay .corner.bottom.right {
+      bottom: 0;
+      right: 0;
+    }
+    .overlay .corner.bottom.left {
+      bottom: 0;
+      left: 0;
+    }
+    .overlay .rect.top {
+      top: 0;
+      left: var(--width);
+      right: var(--width);
+      height: var(--height);
+    }
+    .overlay .rect.bottom {
+      bottom: 0;
+      left: var(--width);
+      right: var(--width);
+      height: var(--height);
+    }
+    .overlay .rect.left {
+      left: 0;
+      top: var(--width);
+      bottom: var(--width);
+      width: var(--height);
+    }
+    .overlay .rect.right {
+      right: 0;
+      top: var(--width);
+      bottom: var(--width);
+      width: var(--height);
+    }
+    /* Overlays de fade laterales para suavizar la transición fuera de la ventana */
     .fade-overlay {
       position: absolute;
       top: 0;
       width: 15%;
       height: 100%;
       pointer-events: none;
-      z-index: 5;
+      z-index: 30;
     }
     .fade-overlay.left {
       left: 0;
-      background: linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0));
+      background: linear-gradient(to right, rgba(240,240,240,1), rgba(240,240,240,0));
     }
     .fade-overlay.right {
       right: 0;
-      background: linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0));
-    }
-    /* Overlays para simular bordes fijos.
-       Están posicionados en la parte externa del wrapper, sobre el sticky-container. */
-    .fixed-border-overlay {
-      position: absolute;
-      top: calc(50% - 30vh); /* Centrado verticalmente respecto al wrapper de 60vh de alto */
-      width: 5px;          /* Grosor del borde */
-      height: 60vh;        /* Igual al alto del wrapper */
-      background: #fff;     /* Color del borde (puedes ajustar) */
-      z-index: 100;
-      pointer-events: none;
-    }
-    .fixed-border-overlay.left {
-      left: calc(50% - 30vw); /* 60vw es el ancho del wrapper, mitad es 30vw; este es el borde izquierdo */
-    }
-    .fixed-border-overlay.right {
-      right: calc(50% - 30vw); /* Borde derecho */
+      background: linear-gradient(to left, rgba(240,240,240,1), rgba(240,240,240,0));
     }
   </style>
 </head>
@@ -116,60 +172,87 @@
   <div class="spacer">
     <h1>Contenido Superior</h1>
   </div>
-
-  <!-- Sección con título fijo, bloques móviles, fade lateral y borde fijo -->
   <section class="scroll-section">
     <div class="sticky-container">
       <!-- Título fijo -->
       <h1 class="section-title">TÍTULO DE LA SECCIÓN</h1>
-
-      <!-- Wrapper central que delimita la ventana de visualización del bloque activo -->
+      <!-- Wrapper central que delimita la ventana -->
       <div class="blocks-wrapper">
-        <!-- Contenedor horizontal que se desplazará -->
-        <div class="horizontal-container" id="horizontal-container">
-          <div class="block">Bloque 1: Texto de ejemplo</div>
-          <div class="block">Bloque 2: Texto de ejemplo</div>
-          <div class="block">Bloque 3: Texto de ejemplo</div>
-          <div class="block">Bloque 4: Texto de ejemplo</div>
+        <!-- Moving Group: contiene la lista de bloques y el overlay -->
+        <div class="moving-group" id="moving-group">
+          <div class="horizontal-container" id="horizontal-container">
+            <div class="block">Bloque 1</div>
+            <div class="block">Bloque 2</div>
+            <div class="block">Bloque 3</div>
+            <div class="block">Bloque 4</div>
+          </div>
+          <!-- Overlay que simula el marco. Se compone de 3 slides -->
+          <div class="overlay">
+            <div class="slide">
+              <div class="corner top left"></div>
+              <div class="rect top"></div>
+              <div class="corner top right"></div>
+              <div class="rect right"></div>
+              <div class="corner bottom right"></div>
+              <div class="rect bottom"></div>
+              <div class="corner bottom left"></div>
+              <div class="rect left"></div>
+            </div>
+            <div class="slide">
+              <div class="corner top left"></div>
+              <div class="rect top"></div>
+              <div class="corner top right"></div>
+              <div class="rect right"></div>
+              <div class="corner bottom right"></div>
+              <div class="rect bottom"></div>
+              <div class="corner bottom left"></div>
+              <div class="rect left"></div>
+            </div>
+            <div class="slide">
+              <div class="corner top left"></div>
+              <div class="rect top"></div>
+              <div class="corner top right"></div>
+              <div class="rect right"></div>
+              <div class="corner bottom right"></div>
+              <div class="rect bottom"></div>
+              <div class="corner bottom left"></div>
+              <div class="rect left"></div>
+            </div>
+          </div>
         </div>
-        <!-- Overlays de difuminado en los laterales dentro del wrapper -->
+        <!-- Overlays de fade laterales -->
         <div class="fade-overlay left"></div>
         <div class="fade-overlay right"></div>
       </div>
-
-      <!-- Overlays para simular bordes fijos, posicionados sobre la ventana central -->
-      <div class="fixed-border-overlay left"></div>
-      <div class="fixed-border-overlay right"></div>
     </div>
   </section>
-
   <div class="spacer">
     <h1>Contenido Inferior</h1>
   </div>
-
   <script>
-    /* CONFIGURACIÓN DEL SCROLL Y LOS GAPS */
+    /******************************************************
+     * Cálculo del desplazamiento horizontal basado en scroll *
+     * Con GAP GENERAL y GAP LOCAL para un efecto pausado  *
+     ******************************************************/
     const scrollSection = document.querySelector('.scroll-section');
+    const movingGroup = document.getElementById('moving-group');
     const horizontalContainer = document.getElementById('horizontal-container');
     const numBlocks = horizontalContainer.children.length;
     const blocksWrapper = document.querySelector('.blocks-wrapper');
-
-    // GAP GENERAL en el scroll vertical: evita que el movimiento horizontal inicie o finalice inmediatamente.
-    const overallGapStart = 0.05; // 20%
-    const overallGapEnd   = 0.95; // 80%
-
-    // GAP LOCAL: en cada segmento (entre bloques) se define una zona sin movimiento.
-    const localGapStart = 0.3; // 30% del segmento
-    const localGapEnd   = 0.7; // 70% del segmento
-
+    
+    // Definición de gaps:
+    const overallGapStart = 0.20; // 20% antes de iniciar
+    const overallGapEnd   = 0.80; // 80% para completar
+    const localGapStart = 0.3;    // 30% de cada segmento sin movimiento
+    const localGapEnd   = 0.7;    // 70% del segmento para finalizar la transición
+    
     window.addEventListener('scroll', () => {
       const sectionRect = scrollSection.getBoundingClientRect();
       let progress = 0;
       if (sectionRect.top <= 0) {
         progress = Math.min(Math.abs(sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 1);
       }
-
-      // 1) GAP GENERAL: determina cuándo inicia y termina el movimiento horizontal global
+      // GAP GENERAL
       let overallProgress = 0;
       if (progress < overallGapStart) {
         overallProgress = 0;
@@ -178,15 +261,13 @@
       } else {
         overallProgress = (progress - overallGapStart) / (overallGapEnd - overallGapStart);
       }
-
-      // 2) Dividir overallProgress en segmentos para cada transición entre bloques
+      // Dividir el progreso en segmentos según el número de transiciones (numBlocks - 1)
       const numTransitions = numBlocks - 1;
       const segmentLength = 1 / numTransitions;
       let segmentIndex = Math.floor(overallProgress / segmentLength);
       if (segmentIndex >= numTransitions) segmentIndex = numTransitions - 1;
       let localProgress = (overallProgress - segmentIndex * segmentLength) / segmentLength;
-
-      // 3) GAP LOCAL: dentro de cada segmento se define una zona sin movimiento
+      // GAP LOCAL
       let interp = 0;
       if (localProgress < localGapStart) {
         interp = 0;
@@ -196,11 +277,9 @@
         interp = (localProgress - localGapStart) / (localGapEnd - localGapStart);
       }
       const effectiveIndex = segmentIndex + interp;
-
-      // 4) Calcular el desplazamiento horizontal en función del ancho del wrapper
-      const blockWidth = blocksWrapper.offsetWidth;
+      const blockWidth = blocksWrapper.offsetWidth;  // ancho del wrapper (60vw)
       const translateX = effectiveIndex * blockWidth;
-      horizontalContainer.style.transform = `translateX(-${translateX}px)`;
+      movingGroup.style.transform = `translateX(-${translateX}px)`;
     });
   </script>
 </body>
