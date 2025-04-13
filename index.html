@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scroll Horizontal con Overlay</title>
+  <title>Scroll Horizontal con Título Fijo y Contenido Centrado</title>
   <style>
+    /* Estilos base */
     html, body {
       margin: 0;
       padding: 0;
       font-family: sans-serif;
     }
-
     .spacer {
       height: 100vh;
       background: #000;
@@ -19,14 +19,14 @@
       justify-content: center;
       align-items: center;
     }
-
     .scroll-container {
       height: calc(100vh * 3);
       position: relative;
       background: black;
       z-index: 0;
     }
-
+    
+    /* Contenedor sticky que fija la zona horizontal en pantalla */
     .styles-wrapper {
       position: sticky;
       top: 0;
@@ -37,27 +37,44 @@
       justify-content: center;
       align-items: center;
     }
-
+    
+    /* Título fijo que se muestra sobre el scroll horizontal */
+    .fixed-title {
+      position: absolute;
+      top: 20px; /* Ajusta la posición vertical a tu gusto */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 4;
+      color: white;
+    }
+    
+    /* Contenedor de la galería que ahora ocupa todo el ancho del viewport */
     .styles-gallery {
-      height: 80vh;
-      width: 80vw;
+      width: 100vw;      /* Ocupamos el 100% del ancho del viewport */
+      height: 80vh;      /* Altura menor para dar margen visual */
       display: flex;
-      flex-direction: row;
+      justify-content: center;
+      align-items: center;
       position: relative;
       z-index: 1;
+      overflow: hidden;
     }
-
+    
+    /* Contenedor de los slides:
+       - Se usa width: max-content para que su ancho sea la suma de los slides.
+       - Se añade padding lateral para centrar el primer y último slide. */
     .content-group {
       display: flex;
+      padding: 0 10vw;   /* 10vw a cada lado garantiza que un slide de 80vw quede centrado */
+      width: max-content;
       transition: transform 0.1s ease-out;
-      height: 100%;
-      width: 100%;
     }
-
+    
+    /* Cada slide tendrá ancho 80vw y se mostrará centrado dentro del viewport */
     .style {
-      width: 100%;
-      height: 100%;
-      flex: 0 0 100%;
+      flex: 0 0 auto;
+      width: 80vw;  
+      height: 80vh;
       background-color: #f0f0f0;
       display: flex;
       justify-content: center;
@@ -65,61 +82,57 @@
       font-size: 2rem;
       font-weight: bold;
       color: #333;
+      /* Efecto de “clip” que ya tenías */
       clip-path: inset(0 calc((1 - var(--clip-progress, 1)) * 100%) 0 0);
       transition: clip-path 0.3s ease-out;
     }
-
+    
+    /* Asignación de textos a cada slide */
     .style.default::before {
       content: "Bloque 1";
     }
-
     .style.color::before {
       content: "Bloque 2";
     }
-
     .style.bw::before {
       content: "Bloque 3";
     }
-
+    
+    /* Overlay (si lo deseas mantener, se ajusta el ancho para contemplar el padding) */
     .overlay {
       position: absolute;
       top: 0;
       left: 0;
-      width: 300%;
+      /* Ancho = ancho del viewport + padding lateral (10vw + 10vw) */
+      width: calc(100vw + 20vw);
       height: 100%;
       display: flex;
       pointer-events: none;
       transition: transform 0.1s ease-out;
       z-index: 2;
     }
-
     .slide {
-      width: 100%;
+      flex: 0 0 100vw;  /* Cada slide del overlay ocupa el ancho total del viewport */
       height: 100%;
       position: relative;
-      flex-shrink: 0;
     }
-
+    /* Estilos para el overlay (bordes de cada slide) */
     .slide .corner,
     .slide .rect {
       position: absolute;
       background: black;
     }
-
     .corner {
       width: 20px;
       height: 20px;
     }
-
     .rect {
       background: black;
     }
-
     .top.left { top: 0; left: 0; }
     .top.right { top: 0; right: 0; }
     .bottom.left { bottom: 0; left: 0; }
     .bottom.right { bottom: 0; right: 0; }
-
     .rect.top { top: 0; left: 20px; right: 20px; height: 4px; }
     .rect.bottom { bottom: 0; left: 20px; right: 20px; height: 4px; }
     .rect.left { top: 20px; bottom: 20px; left: 0; width: 4px; }
@@ -127,71 +140,82 @@
   </style>
 </head>
 <body>
-
   <div class="spacer">Scroll para ver la galería</div>
-
+  
   <div class="scroll-container" id="scroll-container">
     <div class="styles-wrapper">
+      <!-- Título fijo que permanece en la parte superior de la sección -->
+      <div class="fixed-title">
+        <h1>Mi Galería Fija</h1>
+      </div>
       <div class="styles-gallery">
+        <!-- Contenedor de los slides -->
         <div class="content-group" id="content-group">
           <div class="style default"></div>
           <div class="style color"></div>
           <div class="style bw"></div>
-          <div class="overlay" id="overlay">
-            <div class="slide">
-              <div class="corner top left"></div>
-              <div class="rect top"></div>
-              <div class="corner top right"></div>
-              <div class="rect right"></div>
-              <div class="corner bottom right"></div>
-              <div class="rect bottom"></div>
-              <div class="corner bottom left"></div>
-              <div class="rect left"></div>
-            </div>
-            <div class="slide">
-              <div class="corner top left"></div>
-              <div class="rect top"></div>
-              <div class="corner top right"></div>
-              <div class="rect right"></div>
-              <div class="corner bottom right"></div>
-              <div class="rect bottom"></div>
-              <div class="corner bottom left"></div>
-              <div class="rect left"></div>
-            </div>
-            <div class="slide">
-              <div class="corner top left"></div>
-              <div class="rect top"></div>
-              <div class="corner top right"></div>
-              <div class="rect right"></div>
-              <div class="corner bottom right"></div>
-              <div class="rect bottom"></div>
-              <div class="corner bottom left"></div>
-              <div class="rect left"></div>
-            </div>
+        </div>
+        <!-- Overlay, si lo deseas mantener (se mueve en sincronía) -->
+        <div class="overlay" id="overlay">
+          <div class="slide">
+            <div class="corner top left"></div>
+            <div class="rect top"></div>
+            <div class="corner top right"></div>
+            <div class="rect right"></div>
+            <div class="corner bottom right"></div>
+            <div class="rect bottom"></div>
+            <div class="corner bottom left"></div>
+            <div class="rect left"></div>
+          </div>
+          <div class="slide">
+            <div class="corner top left"></div>
+            <div class="rect top"></div>
+            <div class="corner top right"></div>
+            <div class="rect right"></div>
+            <div class="corner bottom right"></div>
+            <div class="rect bottom"></div>
+            <div class="corner bottom left"></div>
+            <div class="rect left"></div>
+          </div>
+          <div class="slide">
+            <div class="corner top left"></div>
+            <div class="rect top"></div>
+            <div class="corner top right"></div>
+            <div class="rect right"></div>
+            <div class="corner bottom right"></div>
+            <div class="rect bottom"></div>
+            <div class="corner bottom left"></div>
+            <div class="rect left"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
+  
   <div class="spacer">Fin de la galería</div>
-
+  
   <script>
+    /* Variables y cálculo del scroll horizontal basado en la altura de la sección */
     const scrollContainer = document.getElementById('scroll-container');
     const contentGroup = document.getElementById('content-group');
     const overlay = document.getElementById('overlay');
     const styles = contentGroup.querySelectorAll('.style');
-
     const numSlides = styles.length;
+    const slideWidth = 80; // ancho de cada slide en vw
 
     window.addEventListener('scroll', () => {
       const rect = scrollContainer.getBoundingClientRect();
+      // Calcula el progreso del scroll (valor entre 0 y 1)
       const scrollProgress = Math.min(1, Math.max(0, -rect.top / (window.innerHeight * (numSlides - 1))));
-      const translateX = -scrollProgress * 100 * (numSlides - 1);
-
-      contentGroup.style.transform = `translateX(${translateX}%)`;
-      overlay.style.transform = `translateX(${translateX}%)`;
-
+      
+      // Se calcula la traslación total necesaria en unidades vw para desplazar (numSlides - 1) slides
+      const translateX = -scrollProgress * ((numSlides - 1) * slideWidth);
+      
+      // Se mueve el grupo de contenido y el overlay en sincronía usando vw
+      contentGroup.style.transform = `translateX(${translateX}vw)`;
+      overlay.style.transform = `translateX(${translateX}vw)`;
+      
+      // Efecto clip (ya existente) para cada slide
       styles.forEach((el, i) => {
         const localProgress = Math.max(0, Math.min(1, scrollProgress * numSlides - i));
         el.style.setProperty('--clip-progress', localProgress);
