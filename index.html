@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scroll Horizontal con Bordes</title>
+  <title>Scroll Horizontal con Bordes y Centrado</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       font-family: sans-serif;
     }
-    
+
     /* Espaciadores para separar la sección */
     .spacer {
       height: 100vh;
@@ -20,7 +20,7 @@
       justify-content: center;
       align-items: center;
     }
-    
+
     /* Contenedor principal de la sección */
     .scroll-container {
       height: calc(100vh * 3);
@@ -28,7 +28,7 @@
       background: black;
       z-index: 0;
     }
-    
+
     /* Contenedor sticky que fija la zona horizontal */
     .styles-wrapper {
       position: sticky;
@@ -41,8 +41,8 @@
       align-items: center;
       z-index: 10;
     }
-    
-    /* Título fijo que permanece en la parte superior */
+
+    /* Título fijo en la parte superior de la sección */
     .fixed-title {
       position: absolute;
       top: 20px;
@@ -51,8 +51,8 @@
       z-index: 12;
       color: white;
     }
-    
-    /* Contenedor de la galería de slides */
+
+    /* Contenedor de la galería */
     .styles-gallery {
       width: 100vw;
       height: 80vh;
@@ -63,9 +63,9 @@
       z-index: 2;
       overflow: hidden;
     }
-    
-    /* Contenedor que engloba los slides:
-       - Se usa padding lateral para centrar el primer y último slide */
+
+    /* Contenedor que engloba los slides  
+       Se utiliza padding lateral de 10vw para centrar el primer y último slide. */
     .content-group {
       display: flex;
       padding: 0 10vw;
@@ -74,14 +74,14 @@
       position: relative;
       z-index: 2;
     }
-    
-    /* Cada slide con borde (marco) */
+
+    /* Cada slide tiene 80vw de ancho y 80vh de alto con borde para crear el marco */
     .style {
       flex: 0 0 auto;
       width: 80vw;
       height: 80vh;
       background-color: #f0f0f0;
-      border: 20px solid black;  /* Marco del mismo color del fondo */
+      border: 20px solid black; /* Borde con el mismo color del fondo */
       box-sizing: border-box;
       display: flex;
       justify-content: center;
@@ -90,18 +90,16 @@
       font-weight: bold;
       color: #333;
     }
-    
-    /* Textos identificativos para cada slide */
+
+    /* Etiquetas para identificar cada slide */
     .style.default::before {
-      content: "Bloque 1";
+      content: "Contenido 1";
     }
-    
     .style.color::before {
-      content: "Bloque 2";
+      content: "Contenido 2";
     }
-    
     .style.bw::before {
-      content: "Bloque 3";
+      content: "Contenido 3";
     }
   </style>
 </head>
@@ -130,16 +128,16 @@
     const scrollContainer = document.getElementById('scroll-container');
     const contentGroup = document.getElementById('content-group');
     const styles = contentGroup.querySelectorAll('.style');
-    const numSlides = styles.length;
-    const slideWidth = 80; // ancho de cada slide en vw
+    
+    const numSlides = styles.length;   // Número total de slides (3)
+    const slideWidth = 80;             // Ancho de cada slide en vw
     
     window.addEventListener('scroll', () => {
       const rect = scrollContainer.getBoundingClientRect();
-      // Calcula la proporción de scroll (valor entre 0 y 1)
+      // Calcula el progreso del scroll, valor entre 0 y 1
       const scrollProgress = Math.min(1, Math.max(0, -rect.top / (window.innerHeight * (numSlides - 1))));
-      // Calcula la traslación total basada en el ancho de cada slide
+      // Calcula la traslación total en vw
       const translateX = -scrollProgress * ((numSlides - 1) * slideWidth);
-      
       contentGroup.style.transform = `translateX(${translateX}vw)`;
     });
   </script>
