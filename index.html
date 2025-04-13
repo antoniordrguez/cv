@@ -8,7 +8,6 @@
     html, body {
       margin: 0;
       padding: 0;
-      height: 200vh; /* para simular scroll */
       font-family: sans-serif;
     }
 
@@ -21,25 +20,30 @@
       align-items: center;
     }
 
-    .styles-gallery {
-      position: relative;
+    .scroll-container {
       height: 100vh;
       overflow: hidden;
-      background: black;
+      position: relative;
     }
 
-    .styles-list {
+    .styles-gallery {
+      height: 100vh;
+      width: 300vw; /* 3 pantallas */
+      display: flex;
+      flex-direction: row;
+    }
+
+    .styles-wrapper {
       position: sticky;
       top: 0;
       height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      overflow: hidden;
     }
 
     .content-group {
       display: flex;
       transition: transform 0.1s ease-out;
+      height: 100%;
     }
 
     .style {
@@ -52,15 +56,15 @@
     }
 
     .style.default {
-      background-image: url('https://source.unsplash.com/random/1600x900?sig=1');
+      background-image: url('https://picsum.photos/1600/900');
     }
 
     .style.color {
-      background-image: url('https://source.unsplash.com/random/1600x900?sig=2');
+      background-image: url('https://picsum.photos/1600/900');
     }
 
     .style.bw {
-      background-image: url('https://source.unsplash.com/random/1600x900?sig=3');
+      background-image: url('https://picsum.photos/1600/900');
     }
 
     .overlay {
@@ -110,73 +114,76 @@
 
   <div class="spacer">Scroll para ver la galería</div>
 
-  <section class="styles-gallery">
-    <div class="styles-list">
-      <div class="content-group">
-        <div class="style default"></div>
-        <div class="style color"></div>
-        <div class="style bw"></div>
-        <div class="overlay">
-          <div class="slide">
-            <div class="corner top left"></div>
-            <div class="rect top"></div>
-            <div class="corner top right"></div>
-            <div class="rect right"></div>
-            <div class="corner bottom right"></div>
-            <div class="rect bottom"></div>
-            <div class="corner bottom left"></div>
-            <div class="rect left"></div>
-          </div>
-          <div class="slide">
-            <div class="corner top left"></div>
-            <div class="rect top"></div>
-            <div class="corner top right"></div>
-            <div class="rect right"></div>
-            <div class="corner bottom right"></div>
-            <div class="rect bottom"></div>
-            <div class="corner bottom left"></div>
-            <div class="rect left"></div>
-          </div>
-          <div class="slide">
-            <div class="corner top left"></div>
-            <div class="rect top"></div>
-            <div class="corner top right"></div>
-            <div class="rect right"></div>
-            <div class="corner bottom right"></div>
-            <div class="rect bottom"></div>
-            <div class="corner bottom left"></div>
-            <div class="rect left"></div>
+  <!-- Contenedor que simula el scroll horizontal como scroll vertical -->
+  <div class="scroll-container" id="scroll-container">
+    <div class="styles-wrapper">
+      <div class="styles-gallery">
+        <div class="content-group" id="content-group">
+          <div class="style default"></div>
+          <div class="style color"></div>
+          <div class="style bw"></div>
+          <div class="overlay" id="overlay">
+            <div class="slide">
+              <div class="corner top left"></div>
+              <div class="rect top"></div>
+              <div class="corner top right"></div>
+              <div class="rect right"></div>
+              <div class="corner bottom right"></div>
+              <div class="rect bottom"></div>
+              <div class="corner bottom left"></div>
+              <div class="rect left"></div>
+            </div>
+            <div class="slide">
+              <div class="corner top left"></div>
+              <div class="rect top"></div>
+              <div class="corner top right"></div>
+              <div class="rect right"></div>
+              <div class="corner bottom right"></div>
+              <div class="rect bottom"></div>
+              <div class="corner bottom left"></div>
+              <div class="rect left"></div>
+            </div>
+            <div class="slide">
+              <div class="corner top left"></div>
+              <div class="rect top"></div>
+              <div class="corner top right"></div>
+              <div class="rect right"></div>
+              <div class="corner bottom right"></div>
+              <div class="rect bottom"></div>
+              <div class="corner bottom left"></div>
+              <div class="rect left"></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
   <div class="spacer">Fin de la galería</div>
 
   <script>
-    const section = document.querySelector('.styles-gallery');
-    const content = section.querySelector('.content-group');
-    const styles = content.querySelectorAll('.style');
-    const overlay = content.querySelector('.overlay');
+    const scrollContainer = document.getElementById('scroll-container');
+    const contentGroup = document.getElementById('content-group');
+    const overlay = document.getElementById('overlay');
+    const styles = contentGroup.querySelectorAll('.style');
+
+    // Ajustamos la altura del contenedor al scroll horizontal necesario
+    const numSlides = styles.length;
+    const totalScrollHeight = window.innerHeight * numSlides;
+    scrollContainer.style.height = `${totalScrollHeight}px`;
 
     window.addEventListener('scroll', () => {
-      const sectionTop = section.offsetTop;
-      const sectionHeight = section.offsetHeight;
-      const scrollY = window.scrollY;
+      const rect = scrollContainer.getBoundingClientRect();
+      const scrollProgress = Math.min(1, Math.max(0, -rect.top / rect.height));
+      const translateX = -scrollProgress * window.innerWidth * (numSlides - 1);
 
-      if (scrollY >= sectionTop && scrollY <= sectionTop + sectionHeight) {
-        const progress = (scrollY - sectionTop) / sectionHeight;
-        const translateX = -progress * window.innerWidth * (styles.length - 1);
+      contentGroup.style.transform = `translateX(${translateX}px)`;
+      overlay.style.transform = `translateX(${translateX}px)`;
 
-        content.style.transform = `translateX(${translateX}px)`;
-        overlay.style.transform = `translateX(${translateX}px)`;
-
-        styles.forEach((el, i) => {
-          const localProgress = Math.max(0, Math.min(1, progress * styles.length - i));
-          el.style.setProperty('--clip-progress', localProgress);
-        });
-      }
+      styles.forEach((el, i) => {
+        const localProgress = Math.max(0, Math.min(1, scrollProgress * numSlides - i));
+        el.style.setProperty('--clip-progress', localProgress);
+      });
     });
   </script>
 </body>
