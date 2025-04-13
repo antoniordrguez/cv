@@ -1,285 +1,182 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Adaptación de Overlay al estilo Apple</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scroll Horizontal con Overlay</title>
   <style>
-    /* RESET Y ESTILOS BÁSICOS */
-    * { box-sizing: border-box; }
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
-      background: #fff;
+      height: 200vh; /* para simular scroll */
+      font-family: sans-serif;
     }
+
     .spacer {
       height: 100vh;
-      background: #f0f0f0;
+      background: #000;
+      color: white;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
     }
-    /* SECCIÓN DE SCROLL */
-    .scroll-section {
+
+    .styles-gallery {
       position: relative;
-      height: 400vh; /* Espacio vertical para generar el efecto */
-      background: #f0f0f0;
+      height: 100vh;
+      overflow: hidden;
+      background: black;
     }
-    .sticky-container {
+
+    .styles-list {
       position: sticky;
       top: 0;
       height: 100vh;
-      overflow: visible;
-    }
-    /* Título fijo */
-    .section-title {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 2rem;
-      padding: 10px 20px;
-      z-index: 50;
-      background: white;
-    }
-    /* Wrapper central: ventana fija que muestra el bloque activo */
-    .blocks-wrapper {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 60vw;  /* Ajusta según tu diseño */
-      height: 60vh;
-      overflow: hidden;
-      z-index: 10;
-    }
-    /* Moving Group: agrupa los bloques y el overlay y se mueve con el scroll */
-    .moving-group {
-      position: relative;
-      /* Su ancho es el ancho del wrapper por número de bloques.
-         Aquí tenemos 4 bloques, por lo que es 4 * 100% (del wrapper). */
-      width: calc(100% * 4);
-      height: 100%;
-      transition: transform 0.1s ease-out;
-    }
-    /* Contenedor horizontal de bloques */
-    .horizontal-container {
-      display: flex;
-      height: 100%;
-    }
-    .block {
-      flex-shrink: 0;
-      width: 100%;
-      height: 100%;
-      background: #ddd;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
     }
-    /* Overlay al estilo Apple: estructura copiada y adaptada */
+
+    .content-group {
+      display: flex;
+      transition: transform 0.1s ease-out;
+    }
+
+    .style {
+      min-width: 100vw;
+      height: 100vh;
+      background-size: cover;
+      background-position: center;
+      clip-path: inset(0 calc((1 - var(--clip-progress, 1)) * 100%) 0 0);
+      transition: clip-path 0.3s ease-out;
+    }
+
+    .style.default {
+      background-image: url('https://source.unsplash.com/random/1600x900?sig=1');
+    }
+
+    .style.color {
+      background-image: url('https://source.unsplash.com/random/1600x900?sig=2');
+    }
+
+    .style.bw {
+      background-image: url('https://source.unsplash.com/random/1600x900?sig=3');
+    }
+
     .overlay {
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
+      width: 300vw;
       height: 100%;
-      /* Se utiliza flex para disponer los slides en columnas, como en el ejemplo */
       display: flex;
-      flex-wrap: wrap;
-      flex-direction: column;
-      z-index: 20;
-      will-change: transform;
-      /* Variables para el borde */
-      --gallery-width: 60vw;
-      --width: 10px;
-      --height: 4px;
+      pointer-events: none;
+      transition: transform 0.1s ease-out;
     }
-    .overlay .slide {
-      width: 100%;
+
+    .slide {
+      width: 100vw;
       height: 100%;
       position: relative;
     }
-    .overlay .corner,
-    .overlay .rect {
+
+    .slide .corner,
+    .slide .rect {
       position: absolute;
-      background: #f0f0f0; /* Color que coincide con el fondo de la sección */
+      background: white;
     }
-    .overlay .corner {
-      width: var(--width);
-      height: var(--width);
+
+    .corner {
+      width: 20px;
+      height: 20px;
     }
-    .overlay .corner.top.left {
-      top: 0;
-      left: 0;
+
+    .rect {
+      background: white;
     }
-    .overlay .corner.top.right {
-      top: 0;
-      right: 0;
-    }
-    .overlay .corner.bottom.right {
-      bottom: 0;
-      right: 0;
-    }
-    .overlay .corner.bottom.left {
-      bottom: 0;
-      left: 0;
-    }
-    .overlay .rect.top {
-      top: 0;
-      left: var(--width);
-      right: var(--width);
-      height: var(--height);
-    }
-    .overlay .rect.bottom {
-      bottom: 0;
-      left: var(--width);
-      right: var(--width);
-      height: var(--height);
-    }
-    .overlay .rect.left {
-      left: 0;
-      top: var(--width);
-      bottom: var(--width);
-      width: var(--height);
-    }
-    .overlay .rect.right {
-      right: 0;
-      top: var(--width);
-      bottom: var(--width);
-      width: var(--height);
-    }
-    /* Overlays de fade laterales para suavizar la transición fuera de la ventana */
-    .fade-overlay {
-      position: absolute;
-      top: 0;
-      width: 15%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 30;
-    }
-    .fade-overlay.left {
-      left: 0;
-      background: linear-gradient(to right, rgba(240,240,240,1), rgba(240,240,240,0));
-    }
-    .fade-overlay.right {
-      right: 0;
-      background: linear-gradient(to left, rgba(240,240,240,1), rgba(240,240,240,0));
-    }
+
+    .top.left { top: 0; left: 0; }
+    .top.right { top: 0; right: 0; }
+    .bottom.left { bottom: 0; left: 0; }
+    .bottom.right { bottom: 0; right: 0; }
+
+    .rect.top { top: 0; left: 20px; right: 20px; height: 4px; }
+    .rect.bottom { bottom: 0; left: 20px; right: 20px; height: 4px; }
+    .rect.left { top: 20px; bottom: 20px; left: 0; width: 4px; }
+    .rect.right { top: 20px; bottom: 20px; right: 0; width: 4px; }
   </style>
 </head>
 <body>
-  <div class="spacer">
-    <h1>Contenido Superior</h1>
-  </div>
-  <section class="scroll-section">
-    <div class="sticky-container">
-      <!-- Título fijo -->
-      <h1 class="section-title">TÍTULO DE LA SECCIÓN</h1>
-      <!-- Wrapper central que delimita la ventana -->
-      <div class="blocks-wrapper">
-        <!-- Moving Group: contiene la lista de bloques y el overlay -->
-        <div class="moving-group" id="moving-group">
-          <div class="horizontal-container" id="horizontal-container">
-            <div class="block">Bloque 1</div>
-            <div class="block">Bloque 2</div>
-            <div class="block">Bloque 3</div>
-            <div class="block">Bloque 4</div>
+
+  <div class="spacer">Scroll para ver la galería</div>
+
+  <section class="styles-gallery">
+    <div class="styles-list">
+      <div class="content-group">
+        <div class="style default"></div>
+        <div class="style color"></div>
+        <div class="style bw"></div>
+        <div class="overlay">
+          <div class="slide">
+            <div class="corner top left"></div>
+            <div class="rect top"></div>
+            <div class="corner top right"></div>
+            <div class="rect right"></div>
+            <div class="corner bottom right"></div>
+            <div class="rect bottom"></div>
+            <div class="corner bottom left"></div>
+            <div class="rect left"></div>
           </div>
-          <!-- Overlay que simula el marco. Se compone de 3 slides -->
-          <div class="overlay">
-            <div class="slide">
-              <div class="corner top left"></div>
-              <div class="rect top"></div>
-              <div class="corner top right"></div>
-              <div class="rect right"></div>
-              <div class="corner bottom right"></div>
-              <div class="rect bottom"></div>
-              <div class="corner bottom left"></div>
-              <div class="rect left"></div>
-            </div>
-            <div class="slide">
-              <div class="corner top left"></div>
-              <div class="rect top"></div>
-              <div class="corner top right"></div>
-              <div class="rect right"></div>
-              <div class="corner bottom right"></div>
-              <div class="rect bottom"></div>
-              <div class="corner bottom left"></div>
-              <div class="rect left"></div>
-            </div>
-            <div class="slide">
-              <div class="corner top left"></div>
-              <div class="rect top"></div>
-              <div class="corner top right"></div>
-              <div class="rect right"></div>
-              <div class="corner bottom right"></div>
-              <div class="rect bottom"></div>
-              <div class="corner bottom left"></div>
-              <div class="rect left"></div>
-            </div>
+          <div class="slide">
+            <div class="corner top left"></div>
+            <div class="rect top"></div>
+            <div class="corner top right"></div>
+            <div class="rect right"></div>
+            <div class="corner bottom right"></div>
+            <div class="rect bottom"></div>
+            <div class="corner bottom left"></div>
+            <div class="rect left"></div>
+          </div>
+          <div class="slide">
+            <div class="corner top left"></div>
+            <div class="rect top"></div>
+            <div class="corner top right"></div>
+            <div class="rect right"></div>
+            <div class="corner bottom right"></div>
+            <div class="rect bottom"></div>
+            <div class="corner bottom left"></div>
+            <div class="rect left"></div>
           </div>
         </div>
-        <!-- Overlays de fade laterales -->
-        <div class="fade-overlay left"></div>
-        <div class="fade-overlay right"></div>
       </div>
     </div>
   </section>
-  <div class="spacer">
-    <h1>Contenido Inferior</h1>
-  </div>
+
+  <div class="spacer">Fin de la galería</div>
+
   <script>
-    /******************************************************
-     * Cálculo del desplazamiento horizontal basado en scroll *
-     * Con GAP GENERAL y GAP LOCAL para un efecto pausado  *
-     ******************************************************/
-    const scrollSection = document.querySelector('.scroll-section');
-    const movingGroup = document.getElementById('moving-group');
-    const horizontalContainer = document.getElementById('horizontal-container');
-    const numBlocks = horizontalContainer.children.length;
-    const blocksWrapper = document.querySelector('.blocks-wrapper');
-    
-    // Definición de gaps:
-    const overallGapStart = 0.20; // 20% antes de iniciar
-    const overallGapEnd   = 0.80; // 80% para completar
-    const localGapStart = 0.3;    // 30% de cada segmento sin movimiento
-    const localGapEnd   = 0.7;    // 70% del segmento para finalizar la transición
-    
+    const section = document.querySelector('.styles-gallery');
+    const content = section.querySelector('.content-group');
+    const styles = content.querySelectorAll('.style');
+    const overlay = content.querySelector('.overlay');
+
     window.addEventListener('scroll', () => {
-      const sectionRect = scrollSection.getBoundingClientRect();
-      let progress = 0;
-      if (sectionRect.top <= 0) {
-        progress = Math.min(Math.abs(sectionRect.top) / (scrollSection.offsetHeight - window.innerHeight), 1);
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.offsetHeight;
+      const scrollY = window.scrollY;
+
+      if (scrollY >= sectionTop && scrollY <= sectionTop + sectionHeight) {
+        const progress = (scrollY - sectionTop) / sectionHeight;
+        const translateX = -progress * window.innerWidth * (styles.length - 1);
+
+        content.style.transform = `translateX(${translateX}px)`;
+        overlay.style.transform = `translateX(${translateX}px)`;
+
+        styles.forEach((el, i) => {
+          const localProgress = Math.max(0, Math.min(1, progress * styles.length - i));
+          el.style.setProperty('--clip-progress', localProgress);
+        });
       }
-      // GAP GENERAL
-      let overallProgress = 0;
-      if (progress < overallGapStart) {
-        overallProgress = 0;
-      } else if (progress > overallGapEnd) {
-        overallProgress = 1;
-      } else {
-        overallProgress = (progress - overallGapStart) / (overallGapEnd - overallGapStart);
-      }
-      // Dividir el progreso en segmentos según el número de transiciones (numBlocks - 1)
-      const numTransitions = numBlocks - 1;
-      const segmentLength = 1 / numTransitions;
-      let segmentIndex = Math.floor(overallProgress / segmentLength);
-      if (segmentIndex >= numTransitions) segmentIndex = numTransitions - 1;
-      let localProgress = (overallProgress - segmentIndex * segmentLength) / segmentLength;
-      // GAP LOCAL
-      let interp = 0;
-      if (localProgress < localGapStart) {
-        interp = 0;
-      } else if (localProgress > localGapEnd) {
-        interp = 1;
-      } else {
-        interp = (localProgress - localGapStart) / (localGapEnd - localGapStart);
-      }
-      const effectiveIndex = segmentIndex + interp;
-      const blockWidth = blocksWrapper.offsetWidth;  // ancho del wrapper (60vw)
-      const translateX = effectiveIndex * blockWidth;
-      movingGroup.style.transform = `translateX(-${translateX}px)`;
     });
   </script>
 </body>
